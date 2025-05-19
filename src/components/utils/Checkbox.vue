@@ -1,5 +1,5 @@
     <template>
-        <div class="d-flex align-items-center">
+        <div class="flex items-center">
             <input name="chk[]" type="checkbox" :value="value" v-model="model" class="chkbox">
             <label for="default-checkbox" class="ms-2 lbl">{{ label }}</label>
         </div>

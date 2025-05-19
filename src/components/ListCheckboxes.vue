@@ -5,7 +5,7 @@
         {{ colab }}
     </div>
     <div v-for="(colab, index) in colabcUser" :key="index">
-        <div class="d-flex">
+        <div class="flex">
             <Checkbox :label="colab.colab" v-model="chkVModel" :value="colab" />
         </div>
     </div>
@@ -27,7 +27,7 @@ let lista = ref([])
 let listaColabs = ref([])
 
 let loadColabs = () => {
-    axios.get("colab").then(res => {
+    axios.get("https://api.nucleoengenharia.com.br:8000/colab").then(res => {
         colab.value = res.data
 
         if (admin) {

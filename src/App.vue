@@ -12,16 +12,16 @@ import Header from './template/Header.vue'
         <Header />
       </nav>
     </header>
-    <aside class="col-md-3 col-sm-12 bg-secondary-subtle">
-      <div id="checks" class="mt-3">
-        <h4>Selecione o(s) colaborador(es) para avaliar:</h4>
+    <aside class="bg-zinc-200 p-4">
+      <h4 class="mb-3">Selecione o(s) colaborador(es) para avaliar:</h4>  
+      <div id="checks">
         <ListCheckboxes />
       </div>
     </aside>
     <article>
       <Form />
     </article>
-    <footer>Footer</footer>
+    <footer class="bg-gray-800 text-center text-white text-sm m-0 p-1">&copy; Núcleo Engenharia </footer>
   </div>
 </template>
 
@@ -35,6 +35,15 @@ import Header from './template/Header.vue'
 header {
   // border: 1px solid black;
   grid-column: 1 / -1;
+}
+
+aside {
+  height: calc(100vh - 140px);
+  // overflow-y: auto;
+}
+#checks {
+  height: calc(100vh - 140px);
+  overflow: auto;
 }
 /* 
 article {

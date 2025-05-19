@@ -9,15 +9,37 @@ html, body, #app {
   width: 100%;
   min-width: 100vw;
   margin: 0;
+  overflow-x: hidden;
   
 }
+
 p {
   line-height: 1.2;
   margin-bottom: 0.8rem;
 }
+label, p {
+  font-size: 0.75rem;
+}
+label {
+  font-weight: bold;
+}
+h4{
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.inputs input {
+  font-weight: bold;
+  min-height: 1rem;
+  font-size: 1rem;
+  width: 90%;
+  text-align: center;
+  padding: 4px 6px;
+  border: 0;
+}
 
 .chkbox {
-@apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus: ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600
+@apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm;
 }
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

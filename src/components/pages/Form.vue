@@ -140,7 +140,8 @@ export default {
             return this.postData.desconto + "%"
         },
         loadColabs() {
-            axios.get("colab").then(res => {
+            axios.get("https://api.nucleoengenharia.com.br:8000/colab").then(res => {
+                // console.log("loadColabs1: "+JSON.stringify(res.data))
                 this.colab = res.data
                     .map(colab => {
                         return ({
@@ -201,8 +202,8 @@ export default {
 <template>
     <div class="row p-4">
 
-        <main class="main px-4 col-md-9 col-sm-12">
-            <div id="inf-importante">
+        <main class="main px-4">
+            <div class="flex flex-col" id="inf-importante">
                 <h4>Informações importantes:</h4>
                 <p>A avaliação resultante influenciará a avaliação geral do desempenho do POSTO DE SERVIÇO, podendo
                     afetar a
@@ -215,104 +216,90 @@ export default {
                     avaliação das
                     áreas clientes.</p>
             </div>
-            <form class="form d-flex flex-column vl-parent" @submit.prevent="save">
+            <form class="form vl-parent" @submit.prevent="save">
 
                 <loading v-model:active="isLoading" :can-cancel="true" :is-full-page="fullPage" />
 
-                <div class="row formulario mt-md-4">
-
-                    <div class="col-md-4 col-sm-12 inputs">
-                        <label for="profissional" class="form-label">Selecione o profissional a ser avaliado
-                            abaixo:</label><br>
-
-                        <VueSelect :options="colabcUser" placeholder="Selecione..." inputId="profissional"
-                            id="profissional" aria-label="Profissional" v-model="postData.colab" :isSearchable="true"
-                            :isClearable="true" :isLoading="true"
-                            @option-selected="(option) => postData.liderancas = option.liderancas" required>
-                        </VueSelect>
-
+                <div class="flex md:justify-evenly md:mt-2 bg-gray-300 rounded-md p-3">
+                    <div class="inputs">
+                        <label for="media">Avaliação Média:</label>
+                        <input type="text" id="media" :value="setSoma()" disabled />
                     </div>
-
-                    <div class="col-md-2 col-sm-12 inputs">
-                        <label for="media" class="form-label">Avaliação Média:</label><br>
-                        <input type="text" class="form-control" id="media" :value="setSoma()" disabled />
+                    <div class="inputs">
+                        <label for="nivel">Nível de Serviço:</label>
+                        <input type="text" id="nivel" :value="setNivel()" disabled />
                     </div>
-                    <div class="col-md-2 col-sm-12 inputs">
-                        <label for="nivel" class="form-label">Nível de Serviço:</label><br>
-                        <input type="text" class="form-control" id="nivel" :value="setNivel()" disabled />
-                    </div>
-                    <div class="col-md-3 col-sm-12 inputs">
-                        <label for="desconto" class="form-label">Desconto Percentual na Medição:</label><br>
-                        <input type="text" class="form-control" id="desconto" :value="setDesc()" disabled />
+                    <div class="inputs">
+                        <label for="desconto">Desconto Percentual na Medição:</label>
+                        <input type="text" id="desconto" :value="setDesc()" disabled />
                     </div>
                 </div>
 
-
-                <div class="row stars gx-4 mt-4 gy-sm-3 pb-4">
-                    <div class="col-md-3 col-sm-12 d-flex flex-column">
+                <!-- Perguntas com estrelas -->
+                <div class="flex gap-x-4 mt-4 sm:gap-y-3 pb-4">
+                    <div class="flex flex-col w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
                             <p>Como você avalia a qualidade do Serviço
                                 Prestado?</p>
                         </div>
                         <div>
                             <star-rating @update:rating="setRating" v-model:rating="postData.nota_qualidade"
-                                :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab" :star-size="35" />
-                            <div class="my-3 d-flex flex-column">
-                                <label for="obs_qualidade" class="form-label">Observações:</label>
-                                <textarea class="form-control" id="obs_qualidade" rows="3"
-                                    v-model="postData.obs_qualidade"></textarea>
+                                :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
+                            <div class="my-3 flex flex-col">
+                                <label for="obs_qualidade">Observações:</label>
+                                <textarea id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
                             </div>
                         </div>
 
-                        <div class="mt-1 me-md-3 rounded-3 shadow p-3" v-if="postData.nota_qualidade <= 3">
+                        <div class="mt-1 md:me-3 rounded-md border-2 border-zinc-300 shadow-xl p-5"
+                            v-if="postData.nota_qualidade <= 3">
                             <h5 class="px-3 px-sm-5">Qualidade de serviço:<br>
                                 Marque os itens que não foram atendidos (obrigatório caso a nota seja menor ou igual
                                 a 3)
                             </h5>
 
-                            <div class="d-flex flex-column">
+                            <div class="flex flex-col">
                                 <div class="form-check d-flex align-items-start mt-3" v-for="(option, id) in options1"
                                     :key="id">
-                                    <input class="form-check-input" type="checkbox" :value="option.name"
-                                        :id="'check' + id" v-model="iQualidade" />
-                                    <label class="form-check-label" :for="'check' + id">{{ option.name }}</label>
+                                    <input type="checkbox" :value="option.name" :id="'check' + id"
+                                        v-model="iQualidade" />
+                                    <label :for="'check' + id">{{ option.name }}</label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
 
-                    <div class="col-md-3 col-sm-12 d-flex flex-column">
+                    <div class="flex flex-col w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
                             <p>Com relação ao atendimento no prazo das solicitações
                                 efetuadas ao Posto de Serviço, qual seu nível de satisfação?</p>
                         </div>
                         <div>
                             <star-rating @update:rating="setRating" v-model:rating="postData.nota_prazo"
-                                :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab" :star-size="35" />
-                            <div class="my-3 d-flex flex-column">
-                                <label for="obs_prazo" class="form-label">Observações:</label>
-                                <textarea class="form-control" id="obs_prazo" rows="3"
-                                    v-model="postData.obs_prazo"></textarea>
+                                :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
+                            <div class="my-3 flex flex-col">
+                                <label for="obs_prazo">Observações:</label>
+                                <textarea id="obs_prazo" rows="3" v-model="postData.obs_prazo"></textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 col-sm-12 d-flex flex-column">
+                    <div class="flex flex-col w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
                             <p>Como você avalia a disponibilidade do Posto de
                                 Serviço no horário de serviço?</p>
                         </div>
                         <div>
                             <star-rating @update:rating="setRating" v-model:rating="postData.nota_dispon"
-                                :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab" :star-size="35" />
-                            <div class="my-3 d-flex flex-column">
-                                <label for="obs_dispon" class="form-label">Observações:</label>
-                                <textarea class="form-control" id="obs_dispon" rows="3"
-                                    v-model="postData.obs_dispon"></textarea>
+                                :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
+                            <div class="my-3 flex flex-col">
+                                <label for="obs_dispon">Observações:</label>
+                                <textarea id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
                             </div>
                         </div>
 
-                        <div class="mt-1 me-md-3 rounded-3 shadow p-3" v-if="postData.nota_dispon <= 3">
+                        <div class="mt-1 md:me-3 rounded-md border-2 border-zinc-300 shadow-xl p-5"
+                            v-if="postData.nota_dispon <= 3">
                             <h5 class="px-3 px-sm-5">Disponibilidade: <br>
                                 Marque os itens que não foram atendidos (obrigatório caso a nota seja menor ou igual
                                 a 3)
@@ -321,38 +308,36 @@ export default {
                                 <div class="form-check d-flex align-items-start mt-3" v-for="(option, id) in options2"
                                     :key="id">
 
-                                    <input class="form-check-input" type="checkbox" :value="option.name"
-                                        :id="'check' + id" v-model="iDispon" />
-                                    <label class="form-check-label" :for="'check' + id">{{ option.name }}</label>
+                                    <input type="checkbox" :value="option.name" :id="'check' + id" v-model="iDispon" />
+                                    <label :for="'check' + id">{{ option.name }}</label>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-3 col-sm-12 d-flex flex-column">
+                    <div class="flex flex-col w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
                             <p>Com relação a responsabilidade de profissionais atendendo
                                 ao posto de serviço, qual seu nível de satisfação?</p>
                         </div>
                         <div>
                             <star-rating @update:rating="setRating" v-model:rating="postData.nota_respon"
-                                :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab" :star-size="35" />
+                                :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
 
-                            <div class="my-3 d-flex flex-column">
-                                <label for="obs_respon" class="form-label">Observações:</label>
-                                <textarea class="form-control" id="obs_respon" rows="3"
-                                    v-model="postData.obs_respon"></textarea>
+                            <div class="my-3 flex flex-col">
+                                <label for="obs_respon">Observações:</label>
+                                <textarea id="obs_respon" rows="3" v-model="postData.obs_respon"></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
+                <!-- Final Perguntas com estrelas -->
 
                 <div class="border-top mt-auto pb-3 d-flex justify-content-between align-items-center">
-                    <router-link to="/registros" class="h5">Registros</router-link>
-                    <router-link v-if="admin" to="/colabs" class="h5">Lista de profissionais</router-link>
-                    <router-link v-if="admin" to="/inserir" class="h5">Inserir profissional</router-link>
-                    <button id="submit" type="submit" class="btn btn-primary btn-lg mt-4 float-end">Submeter
-                        Avaliação</button>
+                    <button id="submit" type="submit"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 float-end">
+                        Submeter Avaliação
+                    </button>
                 </div>
             </form>
         </main>
@@ -361,19 +346,8 @@ export default {
 
 
 <style lang="scss" scoped>
-aside{
-    height: calc(100vh - 50px);
-}
-#checks{
-    height: calc((100vh - 100px)/2);
-    overflow: auto;
-}
 .main {
     background-color: #fff;
-}
-h4{
-    font-size: 14px;
-    font-weight: bold;
 }
 
 h5 {
@@ -385,28 +359,27 @@ h5 {
     height: calc(100vh - 260px);
 }
 
-.formulario label {
-    font-weight: bold;
-}
-
 .form-check input {
     margin-right: 10px;
 }
 
 .form-check label {
-    line-height: 1.2;
+    line-height: 0.8 !important;
+    font-weight: normal;
 }
 
 .vue-star-rating-rating-text {
     font-weight: bold !important;
 }
 
-.inputs input {
-    font-weight: bold;
-    min-height: 33px;
-    font-size: 16px;
-    width: 90%;
-    text-align: center;
+.inputs {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    label{
+        margin-bottom: 5px;
+    }
 }
 
 @media(min-width: 768px) {
@@ -426,6 +399,7 @@ h5 {
         input {
             width: 100%;
         }
+
     }
 }
 </style>

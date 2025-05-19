@@ -33,17 +33,24 @@
                         <li>
                             <a href="#"
                                 class="block py-2 px-3 bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0"
-                                aria-current="page">Registros</a>
+                                aria-current="page">
+                                <router-link to="/registros">Registros</router-link>
+                            </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0  ">Lista
-                                de Profissionais</a>
+                                class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0  ">
+                                <!-- class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0  "> -->
+                                <!-- <router-link v-if="admin" to="/colabs">Lista de profissionais</router-link> -->
+                                <router-link to="/colabs">Lista de profissionais</router-link>
+                            </a>
                         </li>
                         <li>
                             <a href="#"
-                                class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0  ">Inserir
-                                Profissional</a>
+                                class="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0  ">
+                                <!-- <router-link v-if="admin" to="/inserir">Inserir profissional</router-link> -->
+                                <router-link to="/inserir">Inserir profissional</router-link>
+                            </a>
                         </li>
 
                     </ul>
@@ -62,7 +69,6 @@
 
 <style lang="scss" scoped>
 header {
-    // background-color: #fff;
 
     p {
         margin-bottom: 4px;
