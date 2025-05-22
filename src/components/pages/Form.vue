@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
 import ListCheckboxes from '@/components/ListCheckboxes.vue'
 import axios from 'axios'
 import StarRating from 'vue-star-rating'
@@ -197,6 +197,212 @@ export default {
         this.loadColabs()
     }
 }
+</script> -->
+
+<script setup>
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
+import ListCheckboxes from '@/components/ListCheckboxes.vue'
+import axios from 'axios'
+import StarRating from 'vue-star-rating'
+import VueSelect from "vue3-select-component"
+
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
+import "vue3-select-component/dist/style.css"
+
+import { dados } from '@/js/store.js'
+
+
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/css/index.css';
+
+import { useColabStore } from '@/stores/colabStore'
+const colabStore = useColabStore()
+
+const store = colabStore.colabItems
+d
+const instance = getCurrentInstance()
+
+const dadosLocal = reactive({})
+const admin = ref(dados.admin)
+const userEmail = ref(dados.email)
+const colabcUser = ref([])
+const colabs = ref([])
+const pontos = ref("")
+const iQualidade = ref([])
+const iDispon = ref([])
+const isLoading = ref(false)
+const fullPage = ref(true)
+
+const postData = reactive({
+    desconto: "",
+    nivel: "",
+    avaliacao: "",
+    nota_qualidade: 5,
+    obs_qualidade: "",
+    nota_prazo: 5,
+    obs_prazo: "",
+    nota_dispon: 5,
+    obs_dispon: "",
+    nota_respon: 5,
+    obs_respon: "",
+    colab: '',
+    demandante: '',
+    itensQualidade: [],
+    itensDispon: [],
+    liderancas: '',
+})
+
+const options1 = [
+    { name: "Comportamento/Atitude: O profissional não demonstra comportamento adequado ou atitude positiva no atendimento.", id: 1 },
+    { name: "Forma de comunicação (Verbal/escrita, cordialidade): Falhas na comunicação, falta de cordialidade ou erros na comunicação escrita. ", id: 2 },
+    { name: "Habilidade no uso de sistemas informatizados e soluções tecnológicas no suporte: Dificuldades ou falhas no uso de sistemas e tecnologias. ", id: 3 },
+    { name: "Apoio a reuniões e eventos: Falta de suporte adequado ou problemas durante reuniões e eventos. ", id: 4 },
+    { name: "Atendimento a demandas: Demora ou falhas no atendimento das solicitações.", id: 5 },
+    { name: "Falta de conhecimentos básicos para as tarefas: Falta de domínio sobre as tarefas básicas relacionadas ao posto de serviço.", id: 6 },
+    { name: "Insuficiência de conhecimento, especialização ou experiência técnica necessária para o posto de serviço: Falta de conhecimento técnico, especialização ou experiência necessária.", id: 7 },
+]
+
+const options2 = [
+    { name: "Posto indisponível por um dia ou mais.", id: 1 },
+    { name: "Frequência de atraso, indisponível no horário administrativo.", id: 2 },
+    { name: "O posto de Serviço estava indisponível em horário previsto para compromisso agendado da gerência.", id: 3 },
+]
+
+function notify() {
+    toast.success("Aguarde, enviando dados...", {
+        autoClose: 3000,
+        theme: 'colored',
+    })
+}
+
+function notifyProf() {
+    toast.warning("Selecione um profissional", {
+        autoClose: 1000,
+        theme: 'colored',
+    })
+}
+
+function setRating(rating) {
+    // O componente StarRating já está vinculado via v-model, então não é necessário atualizar manualmente
+}
+
+function setSoma() {
+    postData.avaliacao = (Number(postData.nota_qualidade) + Number(postData.nota_prazo) + Number(postData.nota_dispon) + Number(postData.nota_respon)) / 4
+    return postData.avaliacao
+}
+
+function setPontos() {
+    let x = postData.avaliacao
+
+    if (x <= 5 && x >= 4.5) {
+        pontos.value = 0
+    } else if (x <= 4.4 && x >= 4) {
+        pontos.value = 1
+    } else if (x <= 3.9 && x >= 3.5) {
+        pontos.value = 5
+    } else if (x <= 3.4 && x >= 2.5) {
+        pontos.value = 7
+    } else if (x <= 2.4 && x >= 1) {
+        pontos.value = 10
+    }
+
+    return pontos.value
+}
+
+function setNivel() {
+    let p = setPontos()
+
+    if (p === 0) {
+        postData.nivel = "A";
+    } else if (p === 1) {
+        postData.nivel = "B";
+    } else if (p === 5) {
+        postData.nivel = "C";
+    } else if (p === 7) {
+        postData.nivel = "D";
+    } else if (p === 10) {
+        postData.nivel = "E";
+    }
+
+    return postData.nivel
+}
+
+function setDesc() {
+    let p = setPontos()
+
+    if (p === 0) {
+        postData.desconto = 0;
+    } else if (p === 1) {
+        postData.desconto = 1;
+    } else if (p === 5) {
+        postData.desconto = 2;
+    } else if (p === 7) {
+        postData.desconto = 3;
+    } else if (p === 10) {
+        postData.desconto = 5;
+    }
+
+    return postData.desconto + "%"
+}
+
+function loadColabs() {
+    axios.get("https://api.nucleoengenharia.com.br:8000/colab").then(res => {
+        const colabList = res.data
+            .map(colab => ({
+                label: colab.colab,
+                value: colab.colab,
+                liderancas: colab.liderancas,
+                demandante: colab.demandante
+            }))
+
+        if (admin.value) {
+            colabcUser.value = colabList
+        } else {
+            colabcUser.value = colabList.filter(colab => colab.demandante === userEmail.value)
+        }
+    }).catch(() => {
+        // Tratar erro se necessário
+    })
+}
+
+function save() {
+    isLoading.value = true
+    setTimeout(() => {
+        isLoading.value = false
+    }, 3500)
+
+    if (postData.colab === "") {
+        notifyProf()
+    } else {
+        postData.itensQualidade = iQualidade.value.join(" | ")
+        postData.itensDispon = iDispon.value.join(" | ")
+        postData.demandante = dados.email
+        postData.desconto = postData.desconto + "%"
+
+        axios.all([
+            axios.post("registros", postData),
+            axios.post("mail", postData)
+        ]).then(() => {
+            reset()
+        }).catch(() => {
+            notify()
+        })
+
+        console.log("this.postData: " + JSON.stringify(postData))
+    }
+}
+
+function reset() {
+    // Força atualização do componente
+    if (instance && instance.proxy && instance.proxy.$forceUpdate) {
+        instance.proxy.$forceUpdate()
+    }
+}
+
+onMounted(() => {
+    loadColabs()
+})
 </script>
 
 <template>
@@ -205,6 +411,7 @@ export default {
         <main class="main px-4">
             <div class="flex flex-col" id="inf-importante">
                 <h4>Informações importantes:</h4>
+                <!-- <div>{{ store[0].label }}</div> -->
                 <p>A avaliação resultante influenciará a avaliação geral do desempenho do POSTO DE SERVIÇO, podendo
                     afetar a
                     medição

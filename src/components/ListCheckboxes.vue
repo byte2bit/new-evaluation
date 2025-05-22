@@ -1,12 +1,12 @@
 <template>
     <!-- {{ listagem() }} -->
-    <div v-for="(colab, index) in listaColabs" :key="index">
+<!--     <div v-for="(colab, index) in listaColabs" :key="index">
         <span class="ms-2">{{ ++index }} -</span>
         {{ colab }}
-    </div>
-    <div v-for="(colab, index) in colabcUser" :key="index">
+    </div> -->
+    <div v-for="(colab) in store" :key="colab">
         <div class="flex">
-            <Checkbox :label="colab.colab" v-model="chkVModel" :value="colab" />
+            <Checkbox :label="colab" v-model="chkVModel" :value="colab" />
         </div>
     </div>
 </template>
@@ -16,6 +16,12 @@ import axios from 'axios'
 import { onMounted, ref } from 'vue';
 import Checkbox from './utils/Checkbox.vue'
 import { dados } from '@/js/store.js'
+import { useColabStore } from '@/stores/colabStore'
+const colabStore = useColabStore()
+
+const store = colabStore.colabItems
+
+console.log(JSON.stringify(store.label))
 
 // let dados = ref({})
 let admin = dados.admin
@@ -26,7 +32,7 @@ let colab = ref([])
 let lista = ref([])
 let listaColabs = ref([])
 
-let loadColabs = () => {
+/* let loadColabs = () => {
     axios.get("https://api.nucleoengenharia.com.br:8000/colab").then(res => {
         colab.value = res.data
 
@@ -37,7 +43,7 @@ let loadColabs = () => {
         }
 
     }).catch("Erro")
-}
+} */
 
 const listagem = () => {
 
@@ -51,7 +57,7 @@ const listagem = () => {
 }
 
 onMounted(() => {
-    loadColabs()
+    // loadColabs()
     listagem()
 })
 

@@ -14,14 +14,14 @@ import Header from './template/Header.vue'
     </header>
     <aside class="bg-zinc-200 p-4">
       <h4 class="mb-3">Selecione o(s) colaborador(es) para avaliar:</h4>  
-      <div id="checks">
+      <div id="checks" class="ps-1">
         <ListCheckboxes />
       </div>
     </aside>
     <article>
       <Form />
     </article>
-    <footer class="bg-gray-800 text-center text-white text-sm m-0 p-1">&copy; Núcleo Engenharia </footer>
+    <footer id="footer" class="bg-gray-800 text-center text-white text-sm m-0 p-1">&copy; Núcleo Engenharia </footer>
   </div>
 </template>
 
@@ -38,12 +38,13 @@ header {
 }
 
 aside {
-  height: calc(100vh - 140px);
+  height: calc(100vh - 110px);
   // overflow-y: auto;
 }
 #checks {
-  height: calc(100vh - 140px);
+  height: calc(100vh - 170px);
   overflow: auto;
+
 }
 /* 
 article {
@@ -54,8 +55,11 @@ aside {
   border: 1px solid black;
 } */
 
-footer {
+#footer {
   // border: 1px solid black;
   grid-column: 1 / -1;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
 </style>
