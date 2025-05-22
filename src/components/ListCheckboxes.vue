@@ -1,12 +1,12 @@
 <template>
     <!-- {{ listagem() }} -->
-<!--     <div v-for="(colab, index) in listaColabs" :key="index">
+    <div v-for="(colab, index) in listaColabs" :key="index">
         <span class="ms-2">{{ ++index }} -</span>
         {{ colab }}
-    </div> -->
+    </div>
     <div v-for="(colab) in store" :key="colab">
         <div class="flex">
-            <Checkbox :label="colab" v-model="chkVModel" :value="colab" />
+            <Checkbox :label="colab.label" v-model="chkVModel" :value="colab.value" />
         </div>
     </div>
 </template>
@@ -21,16 +21,14 @@ const colabStore = useColabStore()
 
 const store = colabStore.colabItems
 
-console.log(JSON.stringify(store.label))
-
 // let dados = ref({})
 let admin = dados.admin
 // let userEmail = dados.email
 let colabcUser = ref([])
 let chkVModel = ref([])
 let colab = ref([])
-let lista = ref([])
-let listaColabs = ref([])
+// let lista = ref([])
+// let listaColabs = ref([])
 
 /* let loadColabs = () => {
     axios.get("https://api.nucleoengenharia.com.br:8000/colab").then(res => {
@@ -48,8 +46,8 @@ let listaColabs = ref([])
 const listagem = () => {
 
     lista.value = []
-    chkVModel.value.map((colab) => {
-        lista.value.push(colab.colab)
+    chkVModel.value.map((store) => {
+        lista.value.push(store.label)
     })
     listaColabs.value = lista.value
     

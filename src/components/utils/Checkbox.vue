@@ -11,7 +11,7 @@ import { computed, onMounted } from "vue";
 
 const props = defineProps({
     modelValue: { type: [Array, Boolean] },
-    value: { type: [Boolean, Object] },
+    value: { type: String },
     label: { type: String },
 });
 

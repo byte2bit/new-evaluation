@@ -217,10 +217,9 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 
 import { useColabStore } from '@/stores/colabStore'
-const colabStore = useColabStore()
+/* const colabStore = useColabStore()
 
-const store = colabStore.colabItems
-d
+const store = colabStore.colabItems */
 const instance = getCurrentInstance()
 
 const dadosLocal = reactive({})

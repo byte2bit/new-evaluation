@@ -15,15 +15,28 @@ export const useColabStore = defineStore('colabs', () => {
             liderancas: "Maria",
             demandante: "João"
         }
-    ]); // ref = state
+    ])// ref = state
 
-    // const totalPrice = computed(); // computed = getter
+    let lista = ref([])
+    let listaColabs = ref([])
+
+    const listagem = computed(() => {
+
+        lista.value = []
+        chkVModel.value.map((store) => {
+            lista.value.push(store.label)
+        })
+        listaColabs.value = lista.value
+
+        return listaColabs.value
+
+    }); // computed = getter
 
     // const addProduct = () => { } // method = action
 
     return {
-        colab,
-        // totalPrice,
+        colabItems,
+        listagem,
         // addProduct
     }
 })
