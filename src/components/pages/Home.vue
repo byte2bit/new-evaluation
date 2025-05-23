@@ -1,31 +1,29 @@
-<script setup>
-import Form from '../template/Form.vue'
-// import Main from '../template/Main.vue'
-// import Header from '../template/Header.vue'
-</script>
-
 <template>
-    <div class="container-xxl g-0" id="container">
+    <aside class="bg-zinc-200 p-4">
+        <h4 class="mb-3">Selecione o(s) colaborador(es) para avaliar:</h4>
+        <div id="checks" class="ps-1">
+            <ListCheckboxes />
+        </div>
+    </aside>
+    <article>
         <Form />
-    </div>
-
+    </article>
 </template>
 
+<script setup>
+import ListCheckboxes from '../ListCheckboxes.vue'
+import Form from './Form.vue';
+
+
+</script>
+
 <style lang="scss" scoped>
-.header-wrapper{
-    background-color: #e0f1f5;
-    border-bottom: 2px solid rgba(0,0,0,0.2);
+#checks {
+    height: calc(100vh - 170px);
+    overflow: auto;
 }
-/* #container{
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-} */
-@media(min-width: 1600px) {
-    #container {
-        max-width: 1500px !important;
-    }
+
+aside {
+    height: calc(100vh - 110px);
 }
 </style>

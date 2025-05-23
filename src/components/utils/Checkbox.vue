@@ -1,6 +1,13 @@
     <template>
         <div class="flex items-center">
-            <input name="chk[]" type="checkbox" :value="value" v-model="model" class="chkbox">
+            <input 
+            name="chk[]" 
+            type="checkbox" 
+            :value="value" 
+            v-model="model" 
+            class="chkbox"
+            @click="seleciona"
+            >
             <label for="default-checkbox" class="ms-2 lbl">{{ label }}</label>
         </div>
 
@@ -8,12 +15,19 @@
 
 <script setup>
 import { computed, onMounted } from "vue";
+import { useColabStore } from '@/stores/colabStore'
+const chkColabs = colabStore.chkColabs
 
 const props = defineProps({
     modelValue: { type: [Array, Boolean] },
     value: { type: String },
     label: { type: String },
 });
+
+const seleciona = (event) => {
+    chkColabs.value = event.target.value
+    console.log("check-chkColabs: "+chkColabs.value)
+}
 
 const emit = defineEmits(["update:modelValue"]);
 

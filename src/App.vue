@@ -1,10 +1,8 @@
 <script setup>
-import ListCheckboxes from './components/ListCheckboxes.vue'
-import Form from './components/pages/Form.vue'
+import Home from './components/pages/Home.vue';
 import Header from './template/Header.vue'
-// import Teste from './components/Teste.vue'
 </script>
-  
+
 <template>
   <div class="content">
     <header>
@@ -12,15 +10,7 @@ import Header from './template/Header.vue'
         <Header />
       </nav>
     </header>
-    <aside class="bg-zinc-200 p-4">
-      <h4 class="mb-3">Selecione o(s) colaborador(es) para avaliar:</h4>  
-      <div id="checks" class="ps-1">
-        <ListCheckboxes />
-      </div>
-    </aside>
-    <article>
-      <Form />
-    </article>
+    <Home />
     <footer id="footer" class="bg-gray-800 text-center text-white text-sm m-0 p-1">&copy; Núcleo Engenharia </footer>
   </div>
 </template>
@@ -33,27 +23,8 @@ import Header from './template/Header.vue'
 }
 
 header {
-  // border: 1px solid black;
   grid-column: 1 / -1;
 }
-
-aside {
-  height: calc(100vh - 110px);
-  // overflow-y: auto;
-}
-#checks {
-  height: calc(100vh - 170px);
-  overflow: auto;
-
-}
-/* 
-article {
-  border: 1px solid black;
-}
-
-aside {
-  border: 1px solid black;
-} */
 
 #footer {
   // border: 1px solid black;

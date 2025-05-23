@@ -1,42 +1,61 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from "vue";
+import { computed, reactive, ref } from "vue"
+import axios from 'axios'
 
 export const useColabStore = defineStore('colabs', () => {
-    const colabItems = ref([
-        {
-            label: "Marineusa",
-            value: "Marineusa",
-            liderancas: "Maria",
-            demandante: "João"
-        },
-        {
-            label: "Vladimiro",
-            value: "Vladimiro",
-            liderancas: "Maria",
-            demandante: "João"
-        }
-    ])// ref = state
 
-    let lista = ref([])
-    let listaColabs = ref([])
+    let chkColabs = ref([])
+    let colab = ref([])
 
-    const listagem = computed(() => {
+    let loadColabs = computed(() => {
+        axios.get("https://api.nucleoengenharia.com.br:8000/colab").then(res => {
+            colab.value = res.data
 
-        lista.value = []
-        chkVModel.value.map((store) => {
-            lista.value.push(store.label)
-        })
-        listaColabs.value = lista.value
+            /*             if (admin) {
+                            colabcUser.value = colab.value
+                        } else {
+                            colabcUser.value = colab.value.filter(colab => colab.demandante === this.userEmail)
+                        } */
 
-        return listaColabs.value
-
-    }); // computed = getter
+        }).catch("Erro")
+        console.log("store-chkColabs: "+chkColabs.value)
+    })
 
     // const addProduct = () => { } // method = action
 
     return {
-        colabItems,
-        listagem,
+        colab,
+        loadColabs,
+        chkColabs,
+        // colabItems,
+        // listagem,
         // addProduct
     }
+/**************************************************************** */
+    /*     const colabItems = reactive({
+        colab: [
+            {
+                id: 1,
+                name: "Colaborador 1",
+                email: "colaborador1@email.com",
+            }
+        ]
+    })// ref = state */
+
+    // let lista = ref([])
+    // let listaColabs = ref([])
+
+    /*     const listagem = computed(() => {
+
+            lista.value = []
+            chkVModel.value.map((store) => {
+                lista.value.push(store.label)
+            })
+            listaColabs.value = lista.value
+
+            return listaColabs.value
+
+        }); // computed = getter */
+
+    // let colabcUser = ref([])
 })
