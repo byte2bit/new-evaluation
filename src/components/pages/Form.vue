@@ -1,7 +1,8 @@
 <script setup>
 import Modal from '../utils/Modal.vue'
 import { initModals } from 'flowbite'
-import { ref, reactive, computed, getCurrentInstance, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import StarRating from 'vue-star-rating'
 
@@ -9,7 +10,7 @@ import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import "vue3-select-component/dist/style.css"
 
-import { dados } from '@/js/store.js'
+// import { dados } from '@/js/store.js'
 
 
 import Loading from 'vue-loading-overlay';
@@ -18,16 +19,22 @@ import 'vue-loading-overlay/dist/css/index.css';
 // Importando o store de colaboradores
 import { useColabStore } from '@/stores/colabStore'
 const colabStore = useColabStore()
-
 let store = colabStore.loadColabs
 
 //colabs selecionados, vindo do store
 let chkColabs = colabStore.chkColabs
 
+// PAREI AQUI ////////////////////////////////////
+const { selectColab } = storeToRefs(chkColabs)
+
+// let selectColab = ref([])
+
 // console.log("chkColabs Form: " + chkColabs)
 
-//para reset
-const instance = getCurrentInstance()
+watch(() => selectColab, () => {
+    console.log('Colaboradores selecionados:')
+    // selectColab.value = newValue
+})
 
 // const pontos = ref("")
 const iQualidade = ref([])
@@ -127,6 +134,24 @@ const submitState = reactive({
     success: false
 })
 
+function validatePostData() {
+    const errors = []
+    
+    if (!chkColabs || chkColabs.length === 0) {
+        errors.push('Selecione pelo menos um colaborador')
+    }
+    
+    if (postData.nota_qualidade <= 3 && iQualidade.value.length === 0) {
+        errors.push('Marque os itens de qualidade não atendidos')
+    }
+    
+    if (postData.nota_dispon <= 3 && iDispon.value.length === 0) {
+        errors.push('Marque os itens de disponibilidade não atendidos')
+    }
+    
+    return errors
+}
+
 const save = async () => {
     submitState.isLoading = true
     submitState.error = null
@@ -153,12 +178,32 @@ const save = async () => {
 }
 
 function reset() {
-    // Força atualização do componente
-    if (instance && instance.proxy && instance.proxy.$forceUpdate) {
-        instance.proxy.$forceUpdate()
-    }
+    Object.assign(postData, {
+        desconto: "",
+        nivel: "",
+        avaliacao: "",
+        nota_qualidade: 5,
+        obs_qualidade: "",
+        nota_prazo: 5,
+        obs_prazo: "",
+        nota_dispon: 5,
+        obs_dispon: "",
+        nota_respon: 5,
+        obs_respon: "",
+        colab: '',
+        demandante: '',
+        itensQualidade: [],
+        itensDispon: [],
+        liderancas: '',
+    })
+    
+    iQualidade.value = []
+    iDispon.value = []
 }
-onMounted(() => { initModals() })
+onMounted(async () => {
+    await colabStore.loadColabs()
+    initModals()
+})
 </script>
 
 <template>
@@ -169,15 +214,8 @@ onMounted(() => { initModals() })
                 <h4>Informações importantes:</h4>
                 <!-- <div>{{ store[0].label }}</div> -->
                 <p>A avaliação resultante influenciará a avaliação geral do desempenho do POSTO DE SERVIÇO, podendo
-                    afetar a
-                    medição
-                    total devido à baixa qualidade, performance, produtividade, atrasos ou falhas nos serviços
-                    prestados.
-                    Baixo desempenho
-                    pode resultará em desconto na medição mensal como penalização pelos serviços insatisfatórios,
-                    conforme
-                    avaliação das
-                    áreas clientes.</p>
+                    afetar a medição total devido à baixa qualidade, performance, produtividade, atrasos ou falhas nos serviços
+                    prestados. Baixo desempenho pode resultará em desconto na medição mensal como penalização pelos serviços insatisfatórios, conforme avaliação das áreas clientes.</p>
             </div>
             <form class="form vl-parent" @submit.prevent="">
                 <!-- <form class="form vl-parent" @submit.prevent="save"> -->
@@ -311,10 +349,11 @@ onMounted(() => { initModals() })
                         Submeter Avaliação
                     </button>
                 </div>
+                
                 <Modal id="default-modal">
                     <template #bodyModal>
                         <div class="flex flex-col">
-                            <p>Colaborador: {{ chkColabs.join(', ') }}</p>
+                            <p>Colaborador: {{ selectColab }}</p>
                             <!-- <p>Colaborador: {{ chkColabs.join(', ') }}</p>
                                 <p>Avaliação Média: {{ avaliacao }}</p>
                                 <p>Nível de Serviço: {{ nivel }}</p>
