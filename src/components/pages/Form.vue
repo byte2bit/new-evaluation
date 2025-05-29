@@ -1,8 +1,7 @@
 <script setup>
 import Modal from '../utils/Modal.vue'
 import { initModals } from 'flowbite'
-import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { storeToRefs } from 'pinia'
+import { ref, reactive, computed, onMounted, watch, watchEffect } from 'vue'
 import axios from 'axios'
 import StarRating from 'vue-star-rating'
 
@@ -12,31 +11,16 @@ import "vue3-select-component/dist/style.css"
 
 // import { dados } from '@/js/store.js'
 
-
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 
 // Importando o store de colaboradores
 import { useColabStore } from '@/stores/colabStore'
 const colabStore = useColabStore()
-let store = colabStore.loadColabs
 
 //colabs selecionados, vindo do store
-let chkColabs = colabStore.chkColabs
+const chkColabs = colabStore.chkColabs
 
-// PAREI AQUI ////////////////////////////////////
-const { selectColab } = storeToRefs(chkColabs)
-
-// let selectColab = ref([])
-
-// console.log("chkColabs Form: " + chkColabs)
-
-watch(() => selectColab, () => {
-    console.log('Colaboradores selecionados:')
-    // selectColab.value = newValue
-})
-
-// const pontos = ref("")
 const iQualidade = ref([])
 const iDispon = ref([])
 const isLoading = ref(false)
@@ -136,19 +120,19 @@ const submitState = reactive({
 
 function validatePostData() {
     const errors = []
-    
-    if (!chkColabs || chkColabs.length === 0) {
+
+    if (!chkColabs.value || chkColabs.value.length === 0) {
         errors.push('Selecione pelo menos um colaborador')
     }
-    
+
     if (postData.nota_qualidade <= 3 && iQualidade.value.length === 0) {
         errors.push('Marque os itens de qualidade não atendidos')
     }
-    
+
     if (postData.nota_dispon <= 3 && iDispon.value.length === 0) {
         errors.push('Marque os itens de disponibilidade não atendidos')
     }
-    
+
     return errors
 }
 
@@ -196,9 +180,10 @@ function reset() {
         itensDispon: [],
         liderancas: '',
     })
-    
+
     iQualidade.value = []
     iDispon.value = []
+    chkColabs.value = []
 }
 onMounted(async () => {
     await colabStore.loadColabs()
@@ -214,8 +199,10 @@ onMounted(async () => {
                 <h4>Informações importantes:</h4>
                 <!-- <div>{{ store[0].label }}</div> -->
                 <p>A avaliação resultante influenciará a avaliação geral do desempenho do POSTO DE SERVIÇO, podendo
-                    afetar a medição total devido à baixa qualidade, performance, produtividade, atrasos ou falhas nos serviços
-                    prestados. Baixo desempenho pode resultará em desconto na medição mensal como penalização pelos serviços insatisfatórios, conforme avaliação das áreas clientes.</p>
+                    afetar a medição total devido à baixa qualidade, performance, produtividade, atrasos ou falhas nos
+                    serviços
+                    prestados. Baixo desempenho pode resultará em desconto na medição mensal como penalização pelos
+                    serviços insatisfatórios, conforme avaliação das áreas clientes.</p>
             </div>
             <form class="form vl-parent" @submit.prevent="">
                 <!-- <form class="form vl-parent" @submit.prevent="save"> -->
@@ -338,8 +325,8 @@ onMounted(async () => {
                 <div class="border-top mt-auto pb-3 flex justify-between items-center">
 
                     <!-- Modal toggle -->
-                    <button data-modal-target="default-modal" data-modal-toggle="default-modal"
-                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    <button data-modal-target="large-modal" data-modal-toggle="large-modal"
+                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
                         type="button">
                         Resumo
                     </button>
@@ -349,19 +336,26 @@ onMounted(async () => {
                         Submeter Avaliação
                     </button>
                 </div>
-                
+
                 <Modal id="default-modal">
                     <template #bodyModal>
-                        <div class="flex flex-col">
-                            <p>Colaborador: {{ selectColab }}</p>
-                            <!-- <p>Colaborador: {{ chkColabs.join(', ') }}</p>
+                        <div class="modal-dados flex justify-evenly *:max-h-80 overflow-y-auto">
+                            <div>
+                                <p>Colaborador(es) selecionado(s): </p>
+                                <ul class="text-sm" v-for="chkColabs in chkColabs.value">
+                                    <li>{{ chkColabs }}</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <p>Colaborador: {{ chkColabs.join(', ') }}</p>
                                 <p>Avaliação Média: {{ avaliacao }}</p>
                                 <p>Nível de Serviço: {{ nivel }}</p>
                                 <p>Desconto Percentual na Medição: {{ desc }}</p>
                                 <p>Observações de Qualidade: {{ postData.obs_qualidade }}</p>
                                 <p>Observações de Prazo: {{ postData.obs_prazo }}</p>
                                 <p>Observações de Disponibilidade: {{ postData.obs_dispon }}</p>
-                                <p>Observações de Responsabilidade: {{ postData.obs_respon }}</p> -->
+                                <p>Observações de Responsabilidade: {{ postData.obs_respon }}</p>
+                            </div>
                         </div>
                     </template>
                 </Modal>
@@ -373,6 +367,11 @@ onMounted(async () => {
 
 
 <style lang="scss" scoped>
+.modal-dados p,
+.modal-dados ul li {
+    font-size: 12px;
+}
+
 .main {
     background-color: #fff;
 }
