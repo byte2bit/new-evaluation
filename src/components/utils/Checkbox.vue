@@ -1,24 +1,36 @@
 <template>
     <div class="flex items-center">
-        <input 
-            name="chk[]" 
-            type="checkbox" 
-            :value="value" 
-            v-model="model" 
-            class="chkbox"
-            :id="`checkbox-${value}`"
-        >
+
+
+<!--         <input 
+        name="chk[]" 
+        type="checkbox" 
+        :value="value" 
+        :id="`checkbox-${value}`" 
+        v-model="model" 
+        class="w-3 h-3 accent-pink-500"
+        > -->
+               <input  type="checkbox"
+                       class="w-6 h-6 accent-pink-500"
+                       :checked="checkBoxSelection.selectedEmail.has(checkBox)"
+                       @click="checkBoxSelection.toggle(checkBox)"
+               >
+
         <label :for="`checkbox-${value}`" class="ms-2 lbl">{{ label }}</label>
     </div>
 </template>
+
 
 <script setup>
 import { computed } from "vue";
 
 const props = defineProps({
-    modelValue: { type: [Array, Boolean] },
-    value: { type: String },
-    label: { type: String },
+    checkBoxes: Array,
+    modelValue: {
+        type: Array,
+        default: () => []
+    },
+    label: String
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -32,6 +44,26 @@ const model = computed({
     },
 });
 </script>
+
+<!-- <template>
+    <input 
+    type="checkbox" 
+    :value="label" 
+    :checked="modelValue.includes(label)"
+    @change="$emit('update:modelValue', $event.target.checked ? [...modelValue, label] : modelValue.filter(item => item !== label))">
+</template>
+
+<script>
+export default {
+    props: {
+        modelValue: {
+            type: Array,
+            default: () => []
+        },
+        label: String
+    },
+}
+</script> -->
 
 <style scoped>
 .chkbox {
