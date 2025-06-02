@@ -1,57 +1,74 @@
 <template>
-    <input type="checkbox" @click="toggleSelection" :checked="allCheckBoxesSelected" class="w-3 h-3 accent-pink-500">
-    <label class="ms-2">Todos</label>
-    <!-- {{ listaColabs }} -->
+    <div>
+        <input type="checkbox" @click="toggleAllSelection" :checked="allCheckBoxesSelected"
+            class="w-3 h-3 accent-pink-500">
+        <label class="ms-2">Todos</label>
 
-    <div v-for="colab in colabStore.colabs" :key="colab.colab">
-        <!--         <div class="flex">
-            <Checkbox :label="colab.colab" v-model="chkVModel" :value="colab.colab" @change="updateChkColabs" />
+        <div v-for="colab in colabStore.colabs" :key="colab.colab" class="line-colabs">
+            <input 
+            type="checkbox" 
+            :id="`checkbox-${colab.colab}`" 
+            class="w-3 h-3 accent-pink-500"
+            :checked="selectedColabs.includes(colab.colab)" 
+            @change="toggleColabSelection(colab.colab)">
 
-        </div> -->
-        <input type="checkbox" class="w-6 h-6 accent-pink-500" :checked="checkBoxSelection.selectedCheckBox.has(checkBox)"
-            @click="checkBoxSelection.toggle(checkBox)">
+            <label 
+            :for="`checkbox-${colab.colab}`" 
+            class="ms-2">
+                {{ colab.colab }}
+            </label>
+        </div>
 
-        <label :for="`checkbox-${value}`" class="ms-2 lbl">{{ label }}</label>
     </div>
-    <!-- <div>Selecionados: {{ listaColabs }}</div> -->
 </template>
 
 <script setup>
-// import Checkbox from './utils/Checkbox.vue'
 import { onMounted, ref, computed } from 'vue'
 import { useColabStore } from '@/stores/colabStore'
 
 const colabStore = useColabStore()
-const emailSelection = useColabStore()
-let chkColabs = colabStore.chkColabs
-let chkVModel = ref([])
+const selectedColabs = ref([])
 
-const allCheckBoxesSelected = computed(() => 
-    chkVModel.value.length === colabStore.colabs.length && colabStore.colabs.length > 0
+const allCheckBoxesSelected = computed(() =>
+    selectedColabs.value.length === colabStore.colabs.length &&
+    colabStore.colabs.length > 0
 )
 
-
-let numberSelected = computed(() => emailSelection.selectedEmails.size)
-let allEmailsSelected = computed(() => numberSelected.value == props.emails.length) /
-
-function toggleSelection() {
+function toggleAllSelection() {
     if (allCheckBoxesSelected.value) {
-        chkVModel.value = []
+        selectedColabs.value = []
     } else {
-        chkVModel.value = colabStore.colabs.map(c => c.colab)
+        selectedColabs.value = colabStore.colabs.map(c => c.colab)
     }
-    updateChkColabs()
+    updateStore()
+}
+
+function toggleColabSelection(colabName) {
+    const index = selectedColabs.value.indexOf(colabName)
+    if (index > -1) {
+        selectedColabs.value.splice(index, 1)
+    } else {
+        selectedColabs.value.push(colabName)
+    }
+    updateStore()
+}
+
+function updateStore() {
+    colabStore.chkColabs = [...selectedColabs.value]
 }
 
 onMounted(() => {
     colabStore.loadColabs()
 })
-
-const updateChkColabs = () => {
-    chkColabs.value = [...chkVModel.value]
-}
-
-const listaColabs = computed(() => chkVModel.value)
 </script>
 
-<style></style>
+
+<style scoped>
+label {
+    font-size: 10px;
+    font-weight: normal;
+}
+.line-colabs{
+    line-height: 1;
+}
+</style>

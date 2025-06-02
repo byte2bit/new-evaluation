@@ -1,7 +1,7 @@
 <script setup>
 import Modal from '../utils/Modal.vue'
 import { initModals } from 'flowbite'
-import { ref, reactive, computed, onMounted, watch, watchEffect } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import axios from 'axios'
 import StarRating from 'vue-star-rating'
 
@@ -20,6 +20,8 @@ const colabStore = useColabStore()
 
 //colabs selecionados, vindo do store
 const chkColabs = colabStore.chkColabs
+
+console.log('Colaboradores selecionados:', chkColabs)
 
 const iQualidade = ref([])
 const iDispon = ref([])
@@ -136,7 +138,7 @@ function validatePostData() {
     return errors
 }
 
-const save = async () => {
+/* const save = async () => {
     submitState.isLoading = true
     submitState.error = null
 
@@ -155,11 +157,12 @@ const save = async () => {
         reset()
     } catch (error) {
         submitState.error = error.message
+        toast.error(error.message, { theme: 'colored' })
         console.error('Save error:', error)
     } finally {
         submitState.isLoading = false
     }
-}
+} */
 
 function reset() {
     Object.assign(postData, {
@@ -342,12 +345,12 @@ onMounted(async () => {
                         <div class="modal-dados flex justify-evenly *:max-h-80 overflow-y-auto">
                             <div>
                                 <p>Colaborador(es) selecionado(s): </p>
-                                <ul class="text-sm" v-for="chkColabs in chkColabs.value">
-                                    <li>{{ chkColabs }}</li>
+                                <ul class="text-sm" v-for="colabs in chkColabs">
+                                    <li>{{ colabs }}</li>
                                 </ul>
                             </div>
                             <div>
-                                <p>Colaborador: {{ chkColabs.join(', ') }}</p>
+                                <!-- <p>Colaborador: {{ chkColabs.join(', ') }}</p> -->
                                 <p>Avaliação Média: {{ avaliacao }}</p>
                                 <p>Nível de Serviço: {{ nivel }}</p>
                                 <p>Desconto Percentual na Medição: {{ desc }}</p>

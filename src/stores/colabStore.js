@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, reactive } from "vue"
+import { ref } from "vue"
 import axios from 'axios'
-
-let selectedCheckBoxes = reactive(new Set())
 
 export const useColabStore = defineStore('colabs', () => {
     const chkColabs = ref([])
@@ -17,32 +15,9 @@ export const useColabStore = defineStore('colabs', () => {
         }
     }
 
-    /* Composable CheckBoxes Selecionados */
-    let selectAll = (allCheckBoxes) => {
-        allCheckBoxes.forEach(checkBox => {
-            selectedCheckBoxes.add(checkBox)
-        })
-    }
-
-    let clear = () => {
-        selectedCheckBoxes.clear()
-    }
-
-    let toggle = function (checkBox) {
-        if (selectedCheckBoxes.has(checkBox)) {
-            selectedCheckBoxes.delete(checkBox)
-        } else {
-            selectedCheckBoxes.add(checkBox)
-        }
-    }
-
     return {
         colabs,
         loadColabs,
-        chkColabs,
-        selectedCheckBoxes,
-        selectAll,
-        clear,
-        toggle
+        chkColabs
     }
 })

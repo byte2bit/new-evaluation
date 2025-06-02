@@ -17,6 +17,7 @@ const Colabs = () => import(/* webpackChunkName: "colabs" */ '@/components/pages
 
 // import Excel from "@/components/pages/Excel.vue"
 const Excel = () => import(/* webpackChunkName: "excel" */ '@/components/pages/Excel.vue')
+const CheckAll = () => import(/* webpackChunkName: "checkall" */ '@/components/utils/CheckAll.vue')
 
 
 const routes = [
@@ -49,6 +50,11 @@ const routes = [
         path: "/excel",
         name: "Excel",
         component: Excel,
+    },
+    {
+        path: "/checkall",
+        name: "CheckAll",
+        component: CheckAll,
     },
 ];
 
