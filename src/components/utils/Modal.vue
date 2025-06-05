@@ -31,9 +31,7 @@
 
 <script setup>
 const props = defineProps({
-    // modelValue: { type: [Array, Boolean] },
     id: { type: String },
-    // label: { type: String },
 });
 
 </script>
