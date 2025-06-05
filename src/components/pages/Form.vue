@@ -1,8 +1,8 @@
 <script setup>
+import SimpleModal from '../utils/SimpleModal.vue'
 import Modal from '../utils/Modal.vue'
 import { initModals } from 'flowbite'
 import { ref, reactive, computed, onMounted } from 'vue'
-import axios from 'axios'
 import StarRating from 'vue-star-rating'
 
 import { toast } from 'vue3-toastify'
@@ -27,6 +27,9 @@ const iQualidade = ref([])
 const iDispon = ref([])
 const isLoading = ref(false)
 const fullPage = ref(true)
+const text = ref("")
+
+let simpleModalFlag = ref(false)
 
 const postData = reactive({
     desconto: "",
@@ -113,6 +116,15 @@ const desc = computed(() => {
     if (p === 10) return "5%"
     return ""
 })
+
+
+const toggleSimpleModal = computed (() => {
+    if (postData.nota_qualidade <= 3) {
+        simpleModalFlag.value = true
+    }
+    return simpleModalFlag.value
+})
+
 
 const submitState = reactive({
     isLoading: false,
@@ -229,40 +241,47 @@ onMounted(async () => {
 
                 <!-- Perguntas com estrelas -->
                 <div class="flex gap-x-4 mt-4 sm:gap-y-3 pb-4">
-                    <div class="flex flex-col w-1/4 p-4 bg-zinc-200 rounded-md">
+                    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
                             <p>Como você avalia a qualidade do Serviço
                                 Prestado?</p>
                         </div>
                         <div>
                             <star-rating v-model:rating="postData.nota_qualidade" :increment="0.5"
-                                active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
+                                active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" @click="simpleModalFlag = true" />
                             <div class="my-3 flex flex-col">
                                 <label for="obs_qualidade">Observações:</label>
-                                <textarea id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
+                                <textarea v-sanitize="text" id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
                             </div>
                         </div>
 
-                        <div class="mt-1 md:me-3 rounded-md border-2 border-zinc-300 shadow-xl p-5"
-                            v-if="postData.nota_qualidade <= 3">
-                            <h5 class="px-3 px-sm-5">Qualidade de serviço:<br>
-                                Marque os itens que não foram atendidos (obrigatório caso a nota seja menor ou igual
-                                a 3)
-                            </h5>
+                        <SimpleModal v-if="toggleSimpleModal" :simpleModalFlag="simpleModalFlag">
+                            <template #bodyModal>
 
-                            <div class="flex flex-col">
-                                <div class="form-check d-flex align-items-start mt-3" v-for="(option, id) in options1"
-                                    :key="id">
-                                    <input type="checkbox" :value="option.name" :id="'check' + id"
-                                        v-model="iQualidade" />
-                                    <label :for="'check' + id">{{ option.name }}</label>
-                                </div>
-                            </div>
-                        </div>
+                                    <h5 class="px-3 px-sm-5">Qualidade de serviço:<br>
+                                        Marque os itens que não foram atendidos (obrigatório caso a nota seja menor ou
+                                        igual
+                                        a 3)
+                                    </h5>
+
+                                    <div class="flex flex-col">
+                                        <div class="form-check d-flex align-items-start mt-3"
+                                            v-for="(option, id) in options1" :key="id">
+                                            <input type="checkbox" :value="option.name" :id="'check' + id"
+                                                v-model="iQualidade" />
+                                            <label :for="'check' + id">{{ option.name }}</label>
+                                        </div>
+                                    </div>
+
+                            </template>
+                        </SimpleModal>
+
+
+
                     </div>
 
 
-                    <div class="flex flex-col w-1/4 p-4 bg-zinc-200 rounded-md">
+                    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
                             <p>Com relação ao atendimento no prazo das solicitações
                                 efetuadas ao Posto de Serviço, qual seu nível de satisfação?</p>
@@ -272,11 +291,11 @@ onMounted(async () => {
                                 active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
                             <div class="my-3 flex flex-col">
                                 <label for="obs_prazo">Observações:</label>
-                                <textarea id="obs_prazo" rows="3" v-model="postData.obs_prazo"></textarea>
+                                <textarea v-sanitize="text" id="obs_prazo" rows="3" v-model="postData.obs_prazo"></textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="flex flex-col w-1/4 p-4 bg-zinc-200 rounded-md">
+                    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
                             <p>Como você avalia a disponibilidade do Posto de
                                 Serviço no horário de serviço?</p>
@@ -286,7 +305,7 @@ onMounted(async () => {
                                 active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
                             <div class="my-3 flex flex-col">
                                 <label for="obs_dispon">Observações:</label>
-                                <textarea id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
+                                <textarea v-sanitize="text" id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
                             </div>
                         </div>
 
@@ -307,7 +326,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <div class="flex flex-col w-1/4 p-4 bg-zinc-200 rounded-md">
+                    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
                             <p>Com relação a responsabilidade de profissionais atendendo
                                 ao posto de serviço, qual seu nível de satisfação?</p>
@@ -318,7 +337,7 @@ onMounted(async () => {
 
                             <div class="my-3 flex flex-col">
                                 <label for="obs_respon">Observações:</label>
-                                <textarea id="obs_respon" rows="3" v-model="postData.obs_respon"></textarea>
+                                <textarea v-sanitize="text" id="obs_respon" rows="3" v-model="postData.obs_respon"></textarea>
                             </div>
                         </div>
                     </div>
@@ -342,14 +361,21 @@ onMounted(async () => {
 
                 <Modal id="default-modal">
                     <template #bodyModal>
-                        <div class="modal-dados flex justify-evenly *:max-h-80 overflow-y-auto">
-                            <div>
-                                <p>Colaborador(es) selecionado(s): </p>
-                                <ul class="text-sm" v-for="colabs in chkColabs">
-                                    <li>{{ colabs }}</li>
-                                </ul>
+                        <div class="modal-dados flex">
+
+                            <div class="flex flex-col">
+
+                                <h2 class="mb-4 font-bold">Colaborador(es) selecionado(s): </h2>
+
+                                <div class="flex flex-col flex-wrap md:max-h-150 md:max-w-230 overflow-auto me-12">
+                                    <ul class="text-sm" v-for="(colabs, index) in colabStore.chkColabs" :key="index">
+                                        <li class="me-4">{{ index + 1 + ' - ' + colabs }}</li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div>
+
+                            <div id="dados">
+                                <h2 class="mb-4 font-bold">Dados avaliados: </h2>
                                 <!-- <p>Colaborador: {{ chkColabs.join(', ') }}</p> -->
                                 <p>Avaliação Média: {{ avaliacao }}</p>
                                 <p>Nível de Serviço: {{ nivel }}</p>
@@ -373,6 +399,10 @@ onMounted(async () => {
 .modal-dados p,
 .modal-dados ul li {
     font-size: 12px;
+}
+
+#dados p {
+    font-size: 1rem;
 }
 
 .main {

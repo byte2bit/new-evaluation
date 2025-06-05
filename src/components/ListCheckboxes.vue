@@ -1,20 +1,16 @@
 <template>
     <div>
+        <!-- Seleciona todos -->
         <input type="checkbox" @click="toggleAllSelection" :checked="allCheckBoxesSelected"
             class="w-3 h-3 accent-pink-500">
-        <label class="ms-2">Todos</label>
+        <label class="ms-2 font-bold">Todos</label>
 
+        <!-- Lista de checkboxes -->
         <div v-for="colab in colabStore.colabs" :key="colab.colab" class="line-colabs">
-            <input 
-            type="checkbox" 
-            :id="`checkbox-${colab.colab}`" 
-            class="w-3 h-3 accent-pink-500"
-            :checked="selectedColabs.includes(colab.colab)" 
-            @change="toggleColabSelection(colab.colab)">
+            <input type="checkbox" :id="`checkbox-${colab.colab}`" class="w-3 h-3 accent-pink-500"
+                :checked="selectedColabs.includes(colab.colab)" @change="toggleColabSelection(colab.colab)">
 
-            <label 
-            :for="`checkbox-${colab.colab}`" 
-            class="ms-2">
+            <label v-memo="colab.colab" :for="`checkbox-${colab.colab}`" class="ms-2">
                 {{ colab.colab }}
             </label>
         </div>
@@ -55,6 +51,7 @@ function toggleColabSelection(colabName) {
 
 function updateStore() {
     colabStore.chkColabs = [...selectedColabs.value]
+    console.log('Selected Colabs:', colabStore.chkColabs)
 }
 
 onMounted(() => {
