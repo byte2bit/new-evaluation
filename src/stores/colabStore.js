@@ -5,7 +5,6 @@ import axios from 'axios'
 export const useColabStore = defineStore('colabs', () => {
     const chkColabs = ref([])
     const colabs = ref([])
-    const simpleModalFlag = ref(false)
 
     // Carrega colaboradores da API
     const loadColabs = async () => {
@@ -41,7 +40,6 @@ export const useColabStore = defineStore('colabs', () => {
         colabs,
         loadColabs,
         chkColabs,
-        simpleModalFlag,
         toggleColab,
         selectAllColabs,
         clearSelection

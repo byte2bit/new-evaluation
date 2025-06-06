@@ -2,12 +2,16 @@
 
     <!-- Main modal -->
     <div id="simple-modal" tabindex="-1" aria-hidden="true"
-        class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
-        :class="{ 'hidden': !simpleModalFlag }">
+        class="hidden fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-xl max-h-full">
             <!-- Modal content -->
             <div class="relative bg-white rounded-lg shadow-sm">
-
+                <!-- Modal header -->
+                <div class="flex items-center justify-center p-4 md:p-5 border-b rounded-t border-gray-200 bg-gray-300">
+                    <h3 class="text-xl font-semibold text-gray-900">
+                        <slot name="headerModal">Título</slot>
+                    </h3>
+                </div>
                 <!-- Modal body -->
                 <div class="p-4 md:p-5 space-y-4">
                     <slot name="bodyModal">Conteúdo do Modal</slot>
@@ -26,12 +30,21 @@
 </template>
 
 <script setup>
+import { useColabStore } from '@/stores/colabStore'
+import { Modal } from 'flowbite'
+
+const colabStore = useColabStore()
+
+
 // Use defineModel for v-model binding
 const simpleModalFlag = defineModel('simpleModalFlag');
 
 const closeModal = () => {
+    const modal = new Modal(document.getElementById('simple-modal'))
+    modal.hide()
     // Modifying the defineModel variable automatically emits the update event
-    simpleModalFlag.value = false;
+    // simpleModalFlag.value = false
+    // smFlag = false
 };
 
 </script>

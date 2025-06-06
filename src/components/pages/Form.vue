@@ -1,9 +1,11 @@
 <script setup>
 import SimpleModal from '../utils/SimpleModal.vue'
-import Modal from '../utils/Modal.vue'
+import ChecksModal from '../utils/ChecksModal.vue'
 import { initModals } from 'flowbite'
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import StarRating from 'vue-star-rating'
+
+import { Modal } from 'flowbite'
 
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
@@ -28,8 +30,6 @@ const iDispon = ref([])
 const isLoading = ref(false)
 const fullPage = ref(true)
 const text = ref("")
-
-let simpleModalFlag = ref(false)
 
 const postData = reactive({
     desconto: "",
@@ -117,15 +117,6 @@ const desc = computed(() => {
     return ""
 })
 
-
-const toggleSimpleModal = computed (() => {
-    if (postData.nota_qualidade <= 3) {
-        simpleModalFlag.value = true
-    }
-    return simpleModalFlag.value
-})
-
-
 const submitState = reactive({
     isLoading: false,
     error: null,
@@ -175,6 +166,19 @@ function validatePostData() {
         submitState.isLoading = false
     }
 } */
+/* const toggleSimpleModal = computed(() => {
+    if (postData.nota_qualidade <= 3) {
+        smFlag = true
+    }
+    return smFlag
+}) */
+
+function initM() {
+    if (postData.nota_qualidade <= 3) {
+        const modal = new Modal(document.getElementById('simple-modal'))
+        modal.show()
+    }
+}
 
 function reset() {
     Object.assign(postData, {
@@ -212,7 +216,7 @@ onMounted(async () => {
         <main class="main px-4">
             <div class="flex flex-col" id="inf-importante">
                 <h4>Informações importantes:</h4>
-                <!-- <div>{{ store[0].label }}</div> -->
+
                 <p>A avaliação resultante influenciará a avaliação geral do desempenho do POSTO DE SERVIÇO, podendo
                     afetar a medição total devido à baixa qualidade, performance, produtividade, atrasos ou falhas nos
                     serviços
@@ -248,38 +252,37 @@ onMounted(async () => {
                         </div>
                         <div>
                             <star-rating v-model:rating="postData.nota_qualidade" :increment="0.5"
-                                active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" @click="simpleModalFlag = true" />
+                                active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" @click="initM"
+                                data-modal-show="simple-modal" data-modal-target="simple-modal" />
                             <div class="my-3 flex flex-col">
                                 <label for="obs_qualidade">Observações:</label>
-                                <textarea v-sanitize="text" id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
+                                <textarea v-sanitize="text" id="obs_qualidade" rows="3"
+                                    v-model="postData.obs_qualidade"></textarea>
                             </div>
                         </div>
 
-                        <SimpleModal v-if="toggleSimpleModal" :simpleModalFlag="simpleModalFlag">
+                        <SimpleModal>
+                            <template #headerModal>
+                                <div class="px-3 px-sm-5 text-center">
+                                    <h3 class="font-bold mb-2">Qualidade de serviço:</h3>
+                                    <h4 class="font-bold">Marque os itens que não foram atendidos</h4>
+                                    <p>(obrigatório caso a nota seja menor ou igual 3)</p>
+                                </div>
+                            </template>
+
                             <template #bodyModal>
-
-                                    <h5 class="px-3 px-sm-5">Qualidade de serviço:<br>
-                                        Marque os itens que não foram atendidos (obrigatório caso a nota seja menor ou
-                                        igual
-                                        a 3)
-                                    </h5>
-
-                                    <div class="flex flex-col">
-                                        <div class="form-check d-flex align-items-start mt-3"
-                                            v-for="(option, id) in options1" :key="id">
-                                            <input type="checkbox" :value="option.name" :id="'check' + id"
-                                                v-model="iQualidade" />
-                                            <label :for="'check' + id">{{ option.name }}</label>
-                                        </div>
+                                <div class="flex flex-col">
+                                    <div class="form-check d-flex align-items-start mt-3"
+                                        v-for="(option, id) in options1" :key="id">
+                                        <input type="checkbox" :value="option.name" :id="'check' + id"
+                                            v-model="iQualidade" />
+                                        <label :for="'check' + id">{{ option.name }}</label>
                                     </div>
-
+                                </div>
                             </template>
                         </SimpleModal>
 
-
-
                     </div>
-
 
                     <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
                         <div class="star-title">
@@ -291,7 +294,8 @@ onMounted(async () => {
                                 active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
                             <div class="my-3 flex flex-col">
                                 <label for="obs_prazo">Observações:</label>
-                                <textarea v-sanitize="text" id="obs_prazo" rows="3" v-model="postData.obs_prazo"></textarea>
+                                <textarea v-sanitize="text" id="obs_prazo" rows="3"
+                                    v-model="postData.obs_prazo"></textarea>
                             </div>
                         </div>
                     </div>
@@ -305,7 +309,8 @@ onMounted(async () => {
                                 active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
                             <div class="my-3 flex flex-col">
                                 <label for="obs_dispon">Observações:</label>
-                                <textarea v-sanitize="text" id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
+                                <textarea v-sanitize="text" id="obs_dispon" rows="3"
+                                    v-model="postData.obs_dispon"></textarea>
                             </div>
                         </div>
 
@@ -337,7 +342,8 @@ onMounted(async () => {
 
                             <div class="my-3 flex flex-col">
                                 <label for="obs_respon">Observações:</label>
-                                <textarea v-sanitize="text" id="obs_respon" rows="3" v-model="postData.obs_respon"></textarea>
+                                <textarea v-sanitize="text" id="obs_respon" rows="3"
+                                    v-model="postData.obs_respon"></textarea>
                             </div>
                         </div>
                     </div>
@@ -359,7 +365,7 @@ onMounted(async () => {
                     </button>
                 </div>
 
-                <Modal id="default-modal">
+                <ChecksModal id="default-modal">
                     <template #bodyModal>
                         <div class="modal-dados flex">
 
@@ -387,7 +393,7 @@ onMounted(async () => {
                             </div>
                         </div>
                     </template>
-                </Modal>
+                </ChecksModal>
 
             </form>
         </main>
