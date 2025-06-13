@@ -1,11 +1,12 @@
 <script setup>
-import SimpleModal from '../utils/SimpleModal.vue'
-import ChecksModal from '../utils/ChecksModal.vue'
-import { initModals } from 'flowbite'
-import { ref, reactive, computed, onMounted, watch } from 'vue'
-import StarRating from 'vue-star-rating'
+import Respon from './form/Respon.vue'
+import Dispon from './form/Dispon.vue'
+import Qualidade from './form/Qualidade.vue'
+import Prazo from './form/Prazo.vue'
 
-import { Modal } from 'flowbite'
+import ChecksModal from '../utils/ChecksModal.vue'
+// import { initModals } from 'flowbite'
+import { ref, reactive, computed, onMounted } from 'vue'
 
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
@@ -18,18 +19,18 @@ import 'vue-loading-overlay/dist/css/index.css';
 
 // Importando o store de colaboradores
 import { useColabStore } from '@/stores/colabStore'
+
 const colabStore = useColabStore()
 
 //colabs selecionados, vindo do store
 const chkColabs = colabStore.chkColabs
 
-console.log('Colaboradores selecionados:', chkColabs)
+// console.log('Colaboradores selecionados:', chkColabs)
 
 const iQualidade = ref([])
 const iDispon = ref([])
 const isLoading = ref(false)
 const fullPage = ref(true)
-const text = ref("")
 
 const postData = reactive({
     desconto: "",
@@ -50,7 +51,7 @@ const postData = reactive({
     liderancas: '',
 })
 
-const options1 = [
+const optQualidade = [
     { name: "Comportamento/Atitude: O profissional não demonstra comportamento adequado ou atitude positiva no atendimento.", id: 1 },
     { name: "Forma de comunicação (Verbal/escrita, cordialidade): Falhas na comunicação, falta de cordialidade ou erros na comunicação escrita. ", id: 2 },
     { name: "Habilidade no uso de sistemas informatizados e soluções tecnológicas no suporte: Dificuldades ou falhas no uso de sistemas e tecnologias. ", id: 3 },
@@ -60,7 +61,7 @@ const options1 = [
     { name: "Insuficiência de conhecimento, especialização ou experiência técnica necessária para o posto de serviço: Falta de conhecimento técnico, especialização ou experiência necessária.", id: 7 },
 ]
 
-const options2 = [
+const optDispon = [
     { name: "Posto indisponível por um dia ou mais.", id: 1 },
     { name: "Frequência de atraso, indisponível no horário administrativo.", id: 2 },
     { name: "O posto de Serviço estava indisponível em horário previsto para compromisso agendado da gerência.", id: 3 },
@@ -173,13 +174,6 @@ function validatePostData() {
     return smFlag
 }) */
 
-function initM() {
-    if (postData.nota_qualidade <= 3) {
-        const modal = new Modal(document.getElementById('simple-modal'))
-        modal.show()
-    }
-}
-
 function reset() {
     Object.assign(postData, {
         desconto: "",
@@ -206,7 +200,7 @@ function reset() {
 }
 onMounted(async () => {
     await colabStore.loadColabs()
-    initModals()
+    // initModals()
 })
 </script>
 
@@ -245,108 +239,14 @@ onMounted(async () => {
 
                 <!-- Perguntas com estrelas -->
                 <div class="flex gap-x-4 mt-4 sm:gap-y-3 pb-4">
-                    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
-                        <div class="star-title">
-                            <p>Como você avalia a qualidade do Serviço
-                                Prestado?</p>
-                        </div>
-                        <div>
-                            <star-rating v-model:rating="postData.nota_qualidade" :increment="0.5"
-                                active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" @click="initM"
-                                data-modal-show="simple-modal" data-modal-target="simple-modal" />
-                            <div class="my-3 flex flex-col">
-                                <label for="obs_qualidade">Observações:</label>
-                                <textarea v-sanitize="text" id="obs_qualidade" rows="3"
-                                    v-model="postData.obs_qualidade"></textarea>
-                            </div>
-                        </div>
 
-                        <SimpleModal>
-                            <template #headerModal>
-                                <div class="px-3 px-sm-5 text-center">
-                                    <h3 class="font-bold mb-2">Qualidade de serviço:</h3>
-                                    <h4 class="font-bold">Marque os itens que não foram atendidos</h4>
-                                    <p>(obrigatório caso a nota seja menor ou igual 3)</p>
-                                </div>
-                            </template>
+                    <Qualidade :postData="postData" :iQualidade="iQualidade" :optQualidade="optQualidade" />
 
-                            <template #bodyModal>
-                                <div class="flex flex-col">
-                                    <div class="form-check d-flex align-items-start mt-3"
-                                        v-for="(option, id) in options1" :key="id">
-                                        <input type="checkbox" :value="option.name" :id="'check' + id"
-                                            v-model="iQualidade" />
-                                        <label :for="'check' + id">{{ option.name }}</label>
-                                    </div>
-                                </div>
-                            </template>
-                        </SimpleModal>
+                    <Prazo :postData="postData" />
 
-                    </div>
+                    <Dispon :postData="postData" :iDispon="iDispon" :optDispon="optDispon" />
 
-                    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
-                        <div class="star-title">
-                            <p>Com relação ao atendimento no prazo das solicitações
-                                efetuadas ao Posto de Serviço, qual seu nível de satisfação?</p>
-                        </div>
-                        <div>
-                            <star-rating v-model:rating="postData.nota_prazo" :increment="0.5"
-                                active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
-                            <div class="my-3 flex flex-col">
-                                <label for="obs_prazo">Observações:</label>
-                                <textarea v-sanitize="text" id="obs_prazo" rows="3"
-                                    v-model="postData.obs_prazo"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
-                        <div class="star-title">
-                            <p>Como você avalia a disponibilidade do Posto de
-                                Serviço no horário de serviço?</p>
-                        </div>
-                        <div>
-                            <star-rating v-model:rating="postData.nota_dispon" :increment="0.5"
-                                active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
-                            <div class="my-3 flex flex-col">
-                                <label for="obs_dispon">Observações:</label>
-                                <textarea v-sanitize="text" id="obs_dispon" rows="3"
-                                    v-model="postData.obs_dispon"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="mt-1 md:me-3 rounded-md border-2 border-zinc-300 shadow-xl p-5"
-                            v-if="postData.nota_dispon <= 3">
-                            <h5 class="px-3 px-sm-5">Disponibilidade: <br>
-                                Marque os itens que não foram atendidos (obrigatório caso a nota seja menor ou igual
-                                a 3)
-                            </h5>
-                            <div class="d-flex flex-column">
-                                <div class="form-check d-flex align-items-start mt-3" v-for="(option, id) in options2"
-                                    :key="id">
-
-                                    <input type="checkbox" :value="option.name" :id="'check' + id" v-model="iDispon" />
-                                    <label :for="'check' + id">{{ option.name }}</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
-                        <div class="star-title">
-                            <p>Com relação a responsabilidade de profissionais atendendo
-                                ao posto de serviço, qual seu nível de satisfação?</p>
-                        </div>
-                        <div>
-                            <star-rating v-model:rating="postData.nota_respon" :increment="0.5"
-                                active-border-color="#1a00ab" active-color="#1a00ab" :star-size="25" />
-
-                            <div class="my-3 flex flex-col">
-                                <label for="obs_respon">Observações:</label>
-                                <textarea v-sanitize="text" id="obs_respon" rows="3"
-                                    v-model="postData.obs_respon"></textarea>
-                            </div>
-                        </div>
-                    </div>
+                    <Respon :postData="postData" />
                 </div>
                 <!-- Final Perguntas com estrelas -->
 
@@ -424,18 +324,6 @@ h5 {
     height: calc(100vh - 260px);
 }
 
-.form-check input {
-    margin-right: 10px;
-}
-
-.form-check label {
-    line-height: 0.8 !important;
-    font-weight: normal;
-}
-
-.vue-star-rating-rating-text {
-    font-weight: bold !important;
-}
 
 .inputs {
     display: flex;
@@ -445,27 +333,6 @@ h5 {
 
     label {
         margin-bottom: 5px;
-    }
-}
-
-@media(min-width: 768px) {
-    .star-title {
-        min-height: 60px;
-    }
-}
-
-@media(max-width: 768px) {
-    .star-title {
-        margin-top: 50px;
-    }
-
-    .inputs {
-        margin-top: 20px;
-
-        input {
-            width: 100%;
-        }
-
     }
 }
 </style>
