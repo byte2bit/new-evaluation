@@ -5,7 +5,6 @@ import Qualidade from './form/Qualidade.vue'
 import Prazo from './form/Prazo.vue'
 
 import ChecksModal from '../utils/ChecksModal.vue'
-// import { initModals } from 'flowbite'
 import { ref, reactive, computed, onMounted } from 'vue'
 
 import { toast } from 'vue3-toastify'
@@ -17,20 +16,23 @@ import "vue3-select-component/dist/style.css"
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 
+
 // Importando o store de colaboradores
 import { useColabStore } from '@/stores/colabStore'
+import { usePostColabStore } from '../../stores/colabStore'
+import { storeToRefs } from 'pinia'
 
+const { chkColabs } = storeToRefs(useColabStore)
 const colabStore = useColabStore()
+const postStore = usePostColabStore()
 
-//colabs selecionados, vindo do store
-const chkColabs = colabStore.chkColabs
+// const { submitState } = storeToRefs(usePostColabStore)
+// const saveColabs = usePostColabStore()
 
-// console.log('Colaboradores selecionados:', chkColabs)
-
-const iQualidade = ref([])
-const iDispon = ref([])
-const isLoading = ref(false)
-const fullPage = ref(true)
+var iQualidade = ref([])
+var iDispon = ref([])
+var isLoading = ref(false)
+var fullPage = ref(true)
 
 const postData = reactive({
     desconto: "",
@@ -46,8 +48,8 @@ const postData = reactive({
     obs_respon: "",
     colab: '',
     demandante: '',
-    itensQualidade: [],
-    itensDispon: [],
+    itensQualidade: '',
+    itensDispon: '',
     liderancas: '',
 })
 
@@ -117,7 +119,7 @@ const desc = computed(() => {
     if (p === 10) return "5%"
     return ""
 })
-
+/* 
 const submitState = reactive({
     isLoading: false,
     error: null,
@@ -140,39 +142,26 @@ function validatePostData() {
     }
 
     return errors
-}
-
-/* const save = async () => {
-    submitState.isLoading = true
-    submitState.error = null
-
-    try {
-        const validationErrors = validatePostData()
-        if (validationErrors.length > 0) {
-            throw new Error(validationErrors.join(', '))
-        }
-
-        await axios.all([
-            axios.post("registros", postData),
-            axios.post("mail", postData)
-        ])
-
-        submitState.success = true
-        reset()
-    } catch (error) {
-        submitState.error = error.message
-        toast.error(error.message, { theme: 'colored' })
-        console.error('Save error:', error)
-    } finally {
-        submitState.isLoading = false
-    }
 } */
-/* const toggleSimpleModal = computed(() => {
-    if (postData.nota_qualidade <= 3) {
-        smFlag = true
-    }
-    return smFlag
-}) */
+
+const save = () => {
+    postStore.saveColabs({
+        desconto: desc.value,
+        nivel: nivel.value,
+        avaliacao: avaliacao.value,
+        nota_qualidade: postData.nota_qualidade,
+        obs_qualidade: postData.obs_qualidade,
+        nota_prazo: postData.nota_prazo,
+        obs_prazo: postData.obs_prazo,
+        nota_dispon: postData.nota_dispon,
+        obs_dispon: postData.obs_dispon,
+        nota_respon: postData.nota_respon,
+        obs_respon: postData.obs_respon,
+        colab: colabStore.chkColabs,
+        itensQualidade: iQualidade.value.join(" | "),
+        itensDispon: iDispon.value.join(" | "),
+    }) 
+}
 
 function reset() {
     Object.assign(postData, {
@@ -189,8 +178,8 @@ function reset() {
         obs_respon: "",
         colab: '',
         demandante: '',
-        itensQualidade: [],
-        itensDispon: [],
+        iQualidade: [],
+        iDispon: [],
         liderancas: '',
     })
 
@@ -202,6 +191,7 @@ onMounted(async () => {
     await colabStore.loadColabs()
     // initModals()
 })
+
 </script>
 
 <template>
@@ -217,7 +207,7 @@ onMounted(async () => {
                     prestados. Baixo desempenho pode resultará em desconto na medição mensal como penalização pelos
                     serviços insatisfatórios, conforme avaliação das áreas clientes.</p>
             </div>
-            <form class="form vl-parent" @submit.prevent="">
+            <form class="form vl-parent" @submit.prevent="save">
                 <!-- <form class="form vl-parent" @submit.prevent="save"> -->
 
                 <loading v-model:active="isLoading" :can-cancel="true" :is-full-page="fullPage" />
@@ -239,15 +229,10 @@ onMounted(async () => {
 
                 <!-- Perguntas com estrelas -->
                 <div class="flex gap-x-4 mt-4 sm:gap-y-3 pb-4">
-
-                    <Qualidade :chkQualidade="postData.nota_qualidade" :iQualidade="iQualidade"
-                        :optQualidade="optQualidade" :obsQualidade="postData.obs_qualidade" />
-
-                    <!--                     <Prazo :postData="postData" />
-
+                    <Qualidade :postData="postData" @iQualidade="iQualidade" :optQualidade="optQualidade" />
+                    <Prazo :postData="postData" />
                     <Dispon :postData="postData" :iDispon="iDispon" :optDispon="optDispon" />
-
-                    <Respon :postData="postData" /> -->
+                    <Respon :postData="postData" />
                 </div>
                 <!-- Final Perguntas com estrelas -->
 
@@ -255,13 +240,13 @@ onMounted(async () => {
 
                     <!-- Modal toggle -->
                     <button data-modal-target="large-modal" data-modal-toggle="large-modal"
-                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center "
+                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 text-center "
                         type="button">
                         Resumo
                     </button>
 
                     <button id="submit" type="submit"
-                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                         Submeter Avaliação
                     </button>
                 </div>
@@ -283,14 +268,74 @@ onMounted(async () => {
 
                             <div id="dados">
                                 <h2 class="mb-4 font-bold">Dados avaliados: </h2>
-                                <!-- <p>Colaborador: {{ chkColabs.join(', ') }}</p> -->
-                                <p>Avaliação Média: {{ avaliacao }}</p>
-                                <p>Nível de Serviço: {{ nivel }}</p>
-                                <p>Desconto Percentual na Medição: {{ desc }}</p>
-                                <p>Observações de Qualidade: {{ postData.obs_qualidade }}</p>
-                                <p>Observações de Prazo: {{ postData.obs_prazo }}</p>
-                                <p>Observações de Disponibilidade: {{ postData.obs_dispon }}</p>
-                                <p>Observações de Responsabilidade: {{ postData.obs_respon }}</p>
+                                <table class="table-fixed text-sm text-left rtl:text-right text-gray-500">
+                                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-3 py-1">Item</th>
+                                            <th scope="col" class="px-3 py-1">Nota / Avaliação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Avaliação
+                                                Média</td>
+                                            <td class="px-3 py-1">{{ avaliacao }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Nível de
+                                                Serviço</td>
+                                            <td class="px-3 py-1">{{ nivel }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Desconto
+                                                Percentual na Medição</td>
+                                            <td class="px-3 py-1">{{ desc }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Como você
+                                                avalia a qualidade do Serviço Prestado?</td>
+                                            <td class="px-3 py-1">{{ postData.nota_qualidade }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Observações de Qualidade</td>
+                                            <td class="px-3 py-1">{{ postData.obs_qualidade }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Com relação ao atendimento no prazo das solicitações efetuadas ao Posto
+                                                de Serviço, qual seu nível de satisfação?</td>
+                                            <td class="px-3 py-1">{{ postData.obs_prazo }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Como você avalia a disponibilidade do Posto de Serviço no horário de
+                                                serviço?</td>
+                                            <td class="px-3 py-1">{{ postData.nota_dispon }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Observações de Disponibilidade:</td>
+                                            <td class="px-3 py-1">{{ postData.obs_dispon }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Com relação a responsabilidade de profissionais atendendo ao posto de
+                                                serviço, qual seu nível de satisfação?</td>
+                                            <td class="px-3 py-1">{{ postData.nota_respon }}</td>
+                                        </tr>
+                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Observações de Responsabilidade</td>
+                                            <td class="px-3 py-1">{{ postData.obs_respon }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p>iQualidade: {{ iQualidade }}</p>
                             </div>
                         </div>
                     </template>

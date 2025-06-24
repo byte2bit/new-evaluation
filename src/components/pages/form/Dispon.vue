@@ -5,8 +5,12 @@
                 Serviço no horário de serviço?</p>
         </div>
         <div>
-            <star-rating v-model:rating="postData.nota_dispon" :increment="0.5" active-border-color="#1a00ab"
-                active-color="#1a00ab" :star-size="25" data-modal-show="sub-modal" data-modal-target="sub-modal" />
+            <star-rating 
+            v-model:rating="postData.nota_dispon" 
+            :increment="0.5" 
+            active-border-color="#1a00ab"
+            active-color="#1a00ab" :star-size="25" data-modal-show="sub-modal-dispon" data-modal-target="sub-modal-dispon" 
+                />
             <div class="my-3 flex flex-col">
                 <label for="obs_dispon">Observações:</label>
                 <textarea v-sanitize="text" id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
@@ -15,7 +19,7 @@
 
         <teleport to="body">
             <!-- Main modal -->
-            <div v-if="showSubModal" id="sub-modal" tabindex="-1"
+            <div id="sub-modal-dispon" tabindex="-1"
                 class="hidden fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                 <div class="relative w-full max-w-xl max-h-full">
                     <!-- Modal content -->
@@ -45,58 +49,48 @@
 
                         <!-- Modal footer -->
                         <div class="flex items-center justify-end p-4 md:p-5 border-t border-gray-200 rounded-b">
-                            <button data-modal-hide="sub-modal" type="button"
+                            <div v-if="showError" class="text-red-600 font-semibold mt-2 me-20">Por favor, selecione
+                                pelo menos um item.</div>
+                            <button data-modal-hide="sub-modal-dispon" type="button"
                                 class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
                                 @click="tryCloseModal">OK</button>
-                            <div v-if="showError" class="text-red-600 mt-2">Selecione pelo menos um item!</div>
                         </div>
                     </div>
                 </div>
             </div>
         </teleport>
 
-        <!--         <SubModal v-model="showSubModal">
-            
-            <template #headerModal>
-                <div class="px-3 px-sm-5 text-center">
-                    <h3 class="font-bold mb-2">Disponibilidade:</h3>
-                    <h4 class="font-bold">Marque os itens que não foram atendidos</h4>
-                    <p>(obrigatório caso a nota seja menor ou igual 3)</p>
-                </div>
-            </template>
-
-            <template #bodyModal>
-                <div class="flex flex-col">
-                    <div class="form-check d-flex align-items-start mt-3" v-for="option in optDispon" :key="option.id">
-                        <input type="checkbox" :value="option.name" :id="`check-dispon-${option.id}`"
-                            v-model="iDispon" />
-                        <label :for="`check-dispon-${option.id}`">{{ option.name }}</label>
-                    </div>
-                </div>
-            </template>
-            
-        </SubModal> -->
     </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-// import SubModal from '@/components/utils/SubModal.vue'
+import { ref, computed, watch } from 'vue'
 import StarRating from 'vue-star-rating'
+import { Modal } from 'flowbite'
 
 const optDispon = defineModel('optDispon')
 const postData = defineModel('postData')
 const iDispon = defineModel('iDispon')
 const text = ref("")
-// const showSubModal = ref(false)
+var showError = ref(false)
 
-// Abre ou fecha o modal automaticamente ao mudar a nota
-watch(() => postData.nota_dispon, (newVal) => {
+watch(() => postData.value.nota_dispon, (newVal) => {
+    var modalsub = new Modal(document.getElementById('sub-modal-dispon'))
     if (newVal <= 3) {
-        showSubModal.value = true
+        modalsub.show()
     } else {
-        showSubModal.value = false
         iDispon.value = []
+        modalsub.hide()
+    }
+})
+
+const tryCloseModal = computed(() => {
+    if (postData.value.nota_dispon <= 3 && iDispon.value.length === 0) {
+        showError.value = true
+    } else {
+        showError.value = false
+        var modal = new Modal(document.getElementById('sub-modal-dispon'))
+        modal.hide()
     }
 })
 

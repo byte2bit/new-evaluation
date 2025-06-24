@@ -55,7 +55,7 @@ function toggleColabSelection(colabName) {
 
 function updateStore() {
     colabStore.chkColabs = [...selectedColabs.value]
-    console.log('Selected Colabs:', colabStore.chkColabs)
+    // console.log('Selected Colabs:', colabStore.chkColabs)
 }
 
 onMounted(() => {
