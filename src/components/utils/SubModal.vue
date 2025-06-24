@@ -31,14 +31,11 @@
 </template>
 
 <script setup>
-import { useColabStore } from '@/stores/colabStore'
 import { Modal } from 'flowbite'
 
-const colabStore = useColabStore()
-
-
-// Use defineModel for v-model binding
-const simpleModalFlag = defineModel('simpleModalFlag');
+const props = defineProps({
+    modelValue: Boolean
+})
 
 const closeModal = () => {
     const modal = new Modal(document.getElementById('sub-modal'))

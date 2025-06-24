@@ -5,14 +5,18 @@ import axios from 'axios'
 export const useColabStore = defineStore('colabs', () => {
     const chkColabs = ref([])
     const colabs = ref([])
+    const isLoading = ref(false)
 
     // Carrega colaboradores da API
     const loadColabs = async () => {
+        isLoading.value = true
         try {
             const res = await axios.get("https://api.nucleoengenharia.com.br:8000/colab")
             colabs.value = res.data
         } catch (e) {
             console.error("Erro ao carregar colaboradores", e)
+        } finally {
+            isLoading.value = false
         }
     }
 
@@ -38,6 +42,7 @@ export const useColabStore = defineStore('colabs', () => {
 
     return {
         colabs,
+        isLoading,
         loadColabs,
         chkColabs,
         toggleColab,
