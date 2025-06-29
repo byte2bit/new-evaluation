@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
         <div class="star-title">
-            <p>Como você avalia a qualidade do Serviço
+            <p>Como você avalia a <b>qualidade</b> do Serviço
                 Prestado?</p>
         </div>
         <div>
@@ -16,7 +16,7 @@
 
         <teleport to="body">
             <!-- Main modal -->
-            <div id="sub-modal-qualidade" tabindex="-1"
+            <div id="sub-modal-qualidade" tabindex="-1" aria-hidden="false"
                 class="hidden fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                 <div class="relative w-full max-w-xl max-h-full">
                     <!-- Modal content -->
@@ -37,12 +37,11 @@
                             <div class="flex flex-col">
                                 <div class="form-check d-flex align-items-start mt-3" v-for="option in optQualidade"
                                     :key="option.id">
-                                    <input type="checkbox" :value="option.name" :id="`check-dispon-${option.id}`"
+                                    <input type="checkbox" :value="option.name" :id="`check-qualid-${option.id}`"
                                         v-model="iQualidade" />
-                                    <label :for="`check-dispon-${option.id}`">{{ option.name }}</label>
+                                    <label :for="`check-qualid-${option.id}`">{{ option.name }}</label>
                                 </div>
                             </div>
-                            {{ iQualidade }}
                         </div>
                         <!-- Modal footer -->
                         <div class="flex items-center justify-end p-4 md:p-5 border-t border-gray-200 rounded-b">
@@ -51,7 +50,7 @@
                                 pelo menos um item.</div>
                             <button data-modal-hide="sub-modal-qualidade" type="button"
                                 class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
-                                @click="tryCloseModal">OK</button>
+                                @click="closeModalQ">OK</button>
 
                         </div>
                     </div>
@@ -63,14 +62,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import StarRating from 'vue-star-rating'
 import { Modal } from 'flowbite'
 
 const optQualidade = defineModel('optQualidade')
 const postData = defineModel('postData')
 const iQualidade = ref([])
-defineEmits(['iQualidade'])
+const emit = defineEmits(['iQualidade'])
 const text = ref("")
 var showError = ref(false)
 
@@ -84,19 +83,20 @@ watch(() => postData.value.nota_qualidade, (newVal) => {
     }
 })
 
-const tryCloseModal = () => {
+const closeModalQ = () => {
     if (postData.value.nota_qualidade <= 3 && iQualidade.value.length === 0) {
         showError.value = true
     } else {
         showError.value = false
-        var modal = new Modal(document.getElementById('sub-modal-qualidade'))
-        modal.hide()
         emit('iQualidade', iQualidade.value)
+        const modal = new Modal(document.getElementById('sub-modal-qualidade'))
+        modal.hide()
+
     }
 }
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" scoped> 
 
 </style>

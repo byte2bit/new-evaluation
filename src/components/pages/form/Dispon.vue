@@ -1,16 +1,13 @@
 <template>
     <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
         <div class="star-title">
-            <p>Como você avalia a disponibilidade do Posto de
+            <p>Como você avalia a <b>disponibilidade</b> do Posto de
                 Serviço no horário de serviço?</p>
         </div>
         <div>
-            <star-rating 
-            v-model:rating="postData.nota_dispon" 
-            :increment="0.5" 
-            active-border-color="#1a00ab"
-            active-color="#1a00ab" :star-size="25" data-modal-show="sub-modal-dispon" data-modal-target="sub-modal-dispon" 
-                />
+            <star-rating v-model:rating="postData.nota_dispon" :increment="0.5" active-border-color="#1a00ab"
+                active-color="#1a00ab" :star-size="25" data-modal-show="sub-modal-dispon"
+                data-modal-target="sub-modal-dispon" />
             <div class="my-3 flex flex-col">
                 <label for="obs_dispon">Observações:</label>
                 <textarea v-sanitize="text" id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
@@ -19,7 +16,7 @@
 
         <teleport to="body">
             <!-- Main modal -->
-            <div id="sub-modal-dispon" tabindex="-1"
+            <div id="sub-modal-dispon" tabindex="-1" aria-hidden="false"
                 class="hidden fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                 <div class="relative w-full max-w-xl max-h-full">
                     <!-- Modal content -->
@@ -53,7 +50,7 @@
                                 pelo menos um item.</div>
                             <button data-modal-hide="sub-modal-dispon" type="button"
                                 class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
-                                @click="tryCloseModal">OK</button>
+                                @click="closeModalD">OK</button>
                         </div>
                     </div>
                 </div>
@@ -64,13 +61,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import StarRating from 'vue-star-rating'
 import { Modal } from 'flowbite'
 
 const optDispon = defineModel('optDispon')
 const postData = defineModel('postData')
-const iDispon = defineModel('iDispon')
+const iDispon = ref([])
+const emit = defineEmits(['iDispon'])
 const text = ref("")
 var showError = ref(false)
 
@@ -84,15 +82,16 @@ watch(() => postData.value.nota_dispon, (newVal) => {
     }
 })
 
-const tryCloseModal = computed(() => {
+const closeModalD = () => {
     if (postData.value.nota_dispon <= 3 && iDispon.value.length === 0) {
         showError.value = true
     } else {
         showError.value = false
+        emit('iDispon', iDispon.value)
         var modal = new Modal(document.getElementById('sub-modal-dispon'))
         modal.hide()
     }
-})
+}
 
 </script>
 

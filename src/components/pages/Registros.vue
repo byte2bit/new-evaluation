@@ -30,7 +30,7 @@
       :items="colabcUser"
       rowsPerPageMessage="linhas por página:"
       rowsOfPageSeparatorMessage="de"
-      emptyMessage="Não há dados disponíveis"
+      emptyMessage="Não há demandantes disponíveis"
       :buttons-pagination="true"
       :search-value="searchValue"
       alternating
@@ -103,7 +103,7 @@ import axios from "axios";
 import Vue3EasyDataTable from "vue3-easy-data-table";
 import "vue3-easy-data-table/dist/style.css";
 
-import { dados } from "../../js/store.js";
+import { demandantes } from '@/stores/demandantes.js'
 
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -113,7 +113,7 @@ import Excel from "./Excel.vue";
 export default {
   data() {
     return {
-      dados: {},
+      demandantes: {},
       colabcUser: [],
       items: [],
       registros: [],
@@ -146,7 +146,7 @@ export default {
   components: {
     EasyDataTable: Vue3EasyDataTable,
     toast,
-    dados,
+    demandantes,
     Excel,
   },
   methods: {
@@ -162,13 +162,13 @@ export default {
         .then((res) => {
           this.registros = res.data;
 
-          this.admin = dados.admin;
+          this.admin = demandantes.admin;
 
           if (this.admin) {
             this.colabcUser = this.registros;
           } else {
             this.colabcUser = this.registros.filter(
-              (registro) => registro.demandante === dados.email
+              (registro) => registro.demandante === demandantes.email
             );
           }
 

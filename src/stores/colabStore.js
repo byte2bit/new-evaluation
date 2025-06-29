@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, reactive } from "vue"
 import axios from 'axios'
-
+import "@/plugins/axios"
+import { demandantes } from '@/stores/demandantes.js'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
@@ -14,7 +15,7 @@ export const useColabStore = defineStore('colabs', () => {
     const loadColabs = async () => {
         isLoading.value = true
         try {
-            const res = await axios.get("https://api.nucleoengenharia.com.br:8000/colab")
+            const res = await axios.get("/colab")
             colabs.value = res.data
         } catch (e) {
             console.error("Erro ao carregar colaboradores", e)
@@ -22,10 +23,6 @@ export const useColabStore = defineStore('colabs', () => {
             isLoading.value = false
         }
     }
-
-    // Envia dados
-
-
     return {
         chkColabs,
         loadColabs,
@@ -42,49 +39,90 @@ export const usePostColabStore = defineStore('postColab', () => {
         success: false
     })
 
-    function validatePostData() {
-        const errors = []
-
-        if (!chkColabs.value || chkColabs.value.length === 0) {
-            errors.push('Selecione pelo menos um colaborador')
-        }
-
-        if (postData.nota_qualidade <= 3 && iQualidade.value.length === 0) {
-            errors.push('Marque os itens de qualidade não atendidos')
-        }
-
-        if (postData.nota_dispon <= 3 && iDispon.value.length === 0) {
-            errors.push('Marque os itens de disponibilidade não atendidos')
-        }
-
-        return errors
-    }
-
     const saveColabs = async (dados) => {
-        console.log("dados saveColabs: "+JSON.stringify(dados))
- /*        submitState.isLoading = true
+        submitState.isLoading = true
         submitState.error = null
 
         try {
-            const validationErrors = validatePostData()
-            if (validationErrors.length > 0) {
-                throw new Error(validationErrors.join(', '))
-            }
+            // console.log("dados saveColabs: " + JSON.stringify(dados))
 
-            await axios.all([
-                axios.post("registros", dados),
-                axios.post("mail", dados)
-            ])
+            var regMail = {}
+            var c = []
+            dados.colab.forEach(colab => {
+                c.push(colab.colab)
+                regMail = {
+                    "colab": c,
+                    "desconto": dados.desconto,
+                    "nivel": dados.nivel,
+                    "avaliacao": dados.avaliacao,
+                    "nota_qualidade": dados.nota_qualidade,
+                    "obs_qualidade": dados.obs_qualidade,
+                    "nota_prazo": dados.nota_prazo,
+                    "obs_prazo": dados.obs_prazo,
+                    "nota_dispon": dados.nota_dispon,
+                    "obs_dispon": dados.obs_dispon,
+                    "nota_respon": dados.nota_respon,
+                    "obs_respon": dados.obs_respon,
+                    "demandante": demandantes.nome,
+                    "itensQualidade": dados.itensQualidade,
+                    "itensDispon": dados.itensDispon
+                }
+            })
+             await axios.all([
+                 axios.post("mail2", regMail),
+                 dados.colab.forEach(colab => {
+                     var reg = {
+                         "colab": colab.colab,
+                         "desconto": dados.desconto,
+                         "nivel": dados.nivel,
+                         "avaliacao": dados.avaliacao,
+                         "nota_qualidade": dados.nota_qualidade,
+                         "obs_qualidade": dados.obs_qualidade,
+                         "nota_prazo": dados.nota_prazo,
+                         "obs_prazo": dados.obs_prazo,
+                         "nota_dispon": dados.nota_dispon,
+                         "obs_dispon": dados.obs_dispon,
+                         "nota_respon": dados.nota_respon,
+                         "obs_respon": dados.obs_respon,
+                         "demandante": demandantes.nome,
+                         "liderancas": colab.liderancas,
+                         "itensQualidade": dados.itensQualidade,
+                         "itensDispon": dados.itensDispon
+                     }
+                     axios.post("registros", reg)
+                    //  console.log(reg)
+                 })
+             ])
+            // console.log("regMail: ", regMail)
 
+            toast.success('Avaliação realizada com sucesso!', {
+                position: 'top-center',
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+                theme: 'colored',
+            })
             submitState.success = true
-            reset()
+            // reset()
         } catch (error) {
             submitState.error = error.message
-            toast.error(error.message, { theme: 'colored' })
+            toast.error('Desculpe, houve um erro no envio dos dados. \nInforme o administrador do sistema >> ' + error.message, {
+                position: 'top-center',
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+                theme: 'colored',
+            })
             console.error('Save error:', error)
         } finally {
             submitState.isLoading = false
-        } */
+        }
     }
     return {
         submitState,

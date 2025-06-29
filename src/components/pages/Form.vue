@@ -3,34 +3,57 @@ import Respon from './form/Respon.vue'
 import Dispon from './form/Dispon.vue'
 import Qualidade from './form/Qualidade.vue'
 import Prazo from './form/Prazo.vue'
+import { Modal } from 'flowbite'
 
 import ChecksModal from '../utils/ChecksModal.vue'
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import "vue3-select-component/dist/style.css"
 
-// import { dados } from '@/js/store.js'
 
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 
-
-// Importando o store de colaboradores
+// Stores
+import { demandantes } from '@/stores/demandantes.js'
 import { useColabStore } from '@/stores/colabStore'
-import { usePostColabStore } from '../../stores/colabStore'
+import { usePostColabStore } from '@/stores/colabStore'
 import { storeToRefs } from 'pinia'
 
 const { chkColabs } = storeToRefs(useColabStore)
 const colabStore = useColabStore()
 const postStore = usePostColabStore()
 
-// const { submitState } = storeToRefs(usePostColabStore)
-// const saveColabs = usePostColabStore()
+function openChecksModal() {
+    var modalsub = new Modal(document.getElementById('large-modal'))
+    if (colabStore.chkColabs.length === 0) {
+        toast.error("Selecione pelo menos um colaborador!", {
+            position: 'bottom-left',
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+            theme: 'colored',
+        })
+        modalsub.hide()
+    } else {
+        modalsub.show()
+        // showChecksModal.value = true
+    }
+}
 
-var iQualidade = ref([])
-var iDispon = ref([])
+function closeChecksModal() {
+    var modalsub = new Modal(document.getElementById('large-modal'))
+    modalsub.hide()
+    // showChecksModal.value = false
+}
+
+var iQualidade = ref('')
+var iDispon = ref('')
 var isLoading = ref(false)
 var fullPage = ref(true)
 
@@ -144,23 +167,52 @@ function validatePostData() {
     return errors
 } */
 
+const getOptQualidade = (opt) =>{
+    iQualidade.value = opt.join(" | ")
+}
+
+const getOptDispon = (optd) =>{
+    iDispon.value = optd.join(" | ")
+}
+
+const iQual = computed(() => {
+    return "&bullet; "+iQualidade.value.replaceAll(" | ", "<br>&bullet; ")
+})
+
+const iDisp = computed(() => {
+    return "&bullet; " +iDispon.value.replaceAll(" | ", "<br>&bullet; ")
+})
+
+var regCompleto = ref([])
+
 const save = () => {
+
+    regCompleto.value = colabStore.colabs.filter(item => colabStore.chkColabs.includes(item.colab));
+    var reg = regCompleto.value.map(item => {
+        return {
+            colab: item.colab,
+            demandante: item.demandante,
+            liderancas: item.liderancas
+        }
+    })
+
     postStore.saveColabs({
-        desconto: desc.value,
-        nivel: nivel.value,
-        avaliacao: avaliacao.value,
-        nota_qualidade: postData.nota_qualidade,
+        desconto: desc.value.toString(),
+        nivel: nivel.value.toString(),
+        avaliacao: avaliacao.value.toString(),
+        nota_qualidade: postData.nota_qualidade.toString(),
         obs_qualidade: postData.obs_qualidade,
-        nota_prazo: postData.nota_prazo,
+        nota_prazo: postData.nota_prazo.toString(),
         obs_prazo: postData.obs_prazo,
-        nota_dispon: postData.nota_dispon,
+        nota_dispon: postData.nota_dispon.toString(),
         obs_dispon: postData.obs_dispon,
-        nota_respon: postData.nota_respon,
+        nota_respon: postData.nota_respon.toString(),
         obs_respon: postData.obs_respon,
-        colab: colabStore.chkColabs,
-        itensQualidade: iQualidade.value.join(" | "),
-        itensDispon: iDispon.value.join(" | "),
+        colab: reg,
+        itensQualidade: iQualidade.value,
+        itensDispon: iDispon.value,
     }) 
+    closeChecksModal()
 }
 
 function reset() {
@@ -178,18 +230,18 @@ function reset() {
         obs_respon: "",
         colab: '',
         demandante: '',
-        iQualidade: [],
-        iDispon: [],
         liderancas: '',
+        iQualidade: '',
+        iDispon: '',
     })
 
-    iQualidade.value = []
-    iDispon.value = []
+    iQualidade.value = ''
+    iDispon.value = ''
     chkColabs.value = []
 }
+
 onMounted(async () => {
     await colabStore.loadColabs()
-    // initModals()
 })
 
 </script>
@@ -207,6 +259,7 @@ onMounted(async () => {
                     prestados. Baixo desempenho pode resultará em desconto na medição mensal como penalização pelos
                     serviços insatisfatórios, conforme avaliação das áreas clientes.</p>
             </div>
+
             <form class="form vl-parent" @submit.prevent="save">
                 <!-- <form class="form vl-parent" @submit.prevent="save"> -->
 
@@ -214,44 +267,66 @@ onMounted(async () => {
 
                 <div class="flex md:justify-evenly md:mt-2 bg-gray-300 rounded-md p-3">
                     <div class="inputs">
-                        <label for="media">Avaliação Média:</label>
+                        <div class="flex flex-row items-start gap-2">
+                            <svg class="ms-1 h-4 w-4 fill-black" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 512 512">
+                                <path
+                                    d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 96c0-17.7 14.3-32 32-32l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32zM160 416c0-17.7 14.3-32 32-32l288 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-288 0c-17.7 0-32-14.3-32-32zM48 368a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
+                            </svg>
+                            <label for="media">Avaliação Média:</label>
+                        </div>
                         <input type="text" id="media" :value="avaliacao" disabled />
                     </div>
                     <div class="inputs">
-                        <label for="nivel">Nível de Serviço:</label>
+                        <div class="flex flex-row items-start gap-2">
+                            <svg class="ms-1 h-4 w-4 fill-black" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 576 512">
+                                <path
+                                    d="M264.5 5.2c14.9-6.9 32.1-6.9 47 0l218.6 101c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 149.8C37.4 145.8 32 137.3 32 128s5.4-17.9 13.9-21.8L264.5 5.2zM476.9 209.6l53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 277.8C37.4 273.8 32 265.3 32 256s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0l152-70.2zm-152 198.2l152-70.2 53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 405.8C37.4 401.8 32 393.3 32 384s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0z" />
+                            </svg>
+                            <label for="nivel">Nível de Serviço:</label>
+                        </div>
                         <input type="text" id="nivel" :value="nivel" disabled />
                     </div>
                     <div class="inputs">
-                        <label for="desconto">Desconto Percentual na Medição:</label>
+                        <div class="flex flex-row items-start gap-2">
+                            <svg class="ms-1 h-4 w-4 fill-black" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 512 512">
+                                <path
+                                    d="M256 0a256 256 0 1 0 0 512A256 256 0 1 0 256 0zM244.7 395.3l-112-112c-4.6-4.6-5.9-11.5-3.5-17.4s8.3-9.9 14.8-9.9l64 0 0-96c0-17.7 14.3-32 32-32l32 0c17.7 0 32 14.3 32 32l0 96 64 0c6.5 0 12.3 3.9 14.8 9.9s1.1 12.9-3.5 17.4l-112 112c-6.2 6.2-16.4 6.2-22.6 0z" />
+                            </svg>
+                            <label for="desconto">Desconto Percentual na Medição:</label>
+                        </div>
+
                         <input type="text" id="desconto" :value="desc" disabled />
                     </div>
                 </div>
 
                 <!-- Perguntas com estrelas -->
                 <div class="flex gap-x-4 mt-4 sm:gap-y-3 pb-4">
-                    <Qualidade :postData="postData" @iQualidade="iQualidade" :optQualidade="optQualidade" />
+                    <Qualidade :postData="postData" @iQualidade="getOptQualidade" :optQualidade="optQualidade" />
                     <Prazo :postData="postData" />
-                    <Dispon :postData="postData" :iDispon="iDispon" :optDispon="optDispon" />
+                    <Dispon :postData="postData" @iDispon="getOptDispon" :optDispon="optDispon" />
                     <Respon :postData="postData" />
                 </div>
                 <!-- Final Perguntas com estrelas -->
 
-                <div class="border-top mt-auto pb-3 flex justify-between items-center">
+                <div class="border-top mt-auto pb-3 flex justify-end items-center">
 
                     <!-- Modal toggle -->
-                    <button data-modal-target="large-modal" data-modal-toggle="large-modal"
+                    <button data-modal-target="large-modal" data-modal-toggle="large-modal" @click="openChecksModal"
                         class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 text-center "
                         type="button">
                         Resumo
                     </button>
 
-                    <button id="submit" type="submit"
+                    <!--                     <button id="submit" type="submit"
                         class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                         Submeter Avaliação
-                    </button>
+                    </button> -->
                 </div>
 
-                <ChecksModal id="default-modal">
+                <ChecksModal @enviar="save">
                     <template #bodyModal>
                         <div class="modal-dados flex">
 
@@ -280,62 +355,88 @@ onMounted(async () => {
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Avaliação
                                                 Média</td>
-                                            <td class="px-3 py-1">{{ avaliacao }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ avaliacao }}</td>
                                         </tr>
                                         <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Nível de
                                                 Serviço</td>
-                                            <td class="px-3 py-1">{{ nivel }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ nivel }}</td>
                                         </tr>
                                         <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Desconto
                                                 Percentual na Medição</td>
-                                            <td class="px-3 py-1">{{ desc }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ desc }}</td>
                                         </tr>
+                                        <!-- Opcionais -->
                                         <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Como você
                                                 avalia a qualidade do Serviço Prestado?</td>
-                                            <td class="px-3 py-1">{{ postData.nota_qualidade }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ postData.nota_qualidade }}</td>
                                         </tr>
-                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+
+                                        <tr v-if="postData.obs_qualidade"
+                                            class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Observações de Qualidade</td>
-                                            <td class="px-3 py-1">{{ postData.obs_qualidade }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ postData.obs_qualidade }}</td>
                                         </tr>
-                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+
+                                        <tr v-if="iQualidade"
+                                            class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Itens de qualidade não atendidos</td>
+                                            <td class="px-3 py-1">
+                                                <span class="text-sm" v-html="iQual"></span>
+                                            </td>
+                                        </tr>
+
+                                        <tr v-if="postData.obs_prazo"
+                                            class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Com relação ao atendimento no prazo das solicitações efetuadas ao Posto
                                                 de Serviço, qual seu nível de satisfação?</td>
-                                            <td class="px-3 py-1">{{ postData.obs_prazo }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ postData.obs_prazo }}</td>
                                         </tr>
                                         <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Como você avalia a disponibilidade do Posto de Serviço no horário de
                                                 serviço?</td>
-                                            <td class="px-3 py-1">{{ postData.nota_dispon }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ postData.nota_dispon }}</td>
                                         </tr>
-                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                        <tr v-if="postData.obs_dispon"
+                                            class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Observações de Disponibilidade:</td>
-                                            <td class="px-3 py-1">{{ postData.obs_dispon }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ postData.obs_dispon }}</td>
                                         </tr>
+
+                                        <tr v-if="iDispon"
+                                            class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                            <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
+                                                Itens de disponibilidade não atendidos</td>
+                                            <td class="px-3 py-1">
+                                                <span class="text-sm" v-html="iDisp"></span>
+                                            </td>
+                                        </tr>
+
                                         <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Com relação a responsabilidade de profissionais atendendo ao posto de
                                                 serviço, qual seu nível de satisfação?</td>
-                                            <td class="px-3 py-1">{{ postData.nota_respon }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ postData.nota_respon }}</td>
                                         </tr>
-                                        <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
+                                        <tr v-if="postData.obs_respon"
+                                            class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                                             <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
                                                 Observações de Responsabilidade</td>
-                                            <td class="px-3 py-1">{{ postData.obs_respon }}</td>
+                                            <td class="px-3 py-1 text-sm">{{ postData.obs_respon }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                <p>iQualidade: {{ iQualidade }}</p>
+                                <!-- chkColabs no form: {{ colabStore.chkColabs }} -->
                             </div>
                         </div>
                     </template>
@@ -355,6 +456,7 @@ onMounted(async () => {
 
 #dados p {
     font-size: 1rem;
+    background-color: #fff;
 }
 
 .main {

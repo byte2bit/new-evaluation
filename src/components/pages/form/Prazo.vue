@@ -2,7 +2,7 @@
 
     <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
         <div class="star-title">
-            <p>Com relação ao atendimento no prazo das solicitações
+            <p>Com relação ao atendimento no <b>prazo</b> das solicitações
                 efetuadas ao Posto de Serviço, qual seu nível de satisfação?</p>
         </div>
         <div>

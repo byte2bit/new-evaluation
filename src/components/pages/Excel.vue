@@ -2,13 +2,13 @@
 import axios from 'axios'
 import exportFromJSON from "export-from-json"
 import { excelParser } from "../utils/excel-parser"
-import { dados } from '../../js/store.js'
+import { demandantes } from '@/stores/demandantes.js'
 
 export default {
     data() {
         return {
-            admin: dados.admin,
-            dados: {},
+            admin: demandantes.admin,
+            demandantes: {},
             colabcUser: [],
             listData: [],
         }
@@ -16,7 +16,7 @@ export default {
     component: {
         exportFromJSON, 
         excelParser,
-        dados
+        demandantes
     },
     methods: {
         loadRegs() {
@@ -24,7 +24,7 @@ export default {
                 .then(res => {
                     this.listData = res.data
 
-                    this.colabcUser = this.listData.filter(registro => registro.demandante === dados.email)
+                    this.colabcUser = this.listData.filter(registro => registro.demandante === demandantes.email)
 
                     var data = this.listData.map((registro => {
                         let a = registro.created_at.split("T")[0]

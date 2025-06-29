@@ -3,14 +3,21 @@
         <div class="flex justify-between items-center p-2 bg-white border-gray-200 dark:bg-gray-900">
             <img src="@/assets/logo-horizontal branco.png" class="h-6" alt="Núcleo Logo" />
             <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
-                <span class="self-center text-xl font-semibold whitespace-nowrap font-white dark:text-white">Núcleo
+                <span class="self-center text-xl font-semibold whitespace-nowrap font-white dark:text-white">
                     Avaliação de Nível de Serviço</span>
             </a>
-            <div class="text-white me-6">
-                <p class="mb-1 demandante">Nome: Nome do Demandante</p>
-                <p class="demandante">Email: Email do Demandante</p>
-                <!-- <p class="mb-1"><b>Nome: </b>{{ dados.nome }}</p>
+            <div class="flex items-center gap-3">
+                <svg class="ms-1 h-5 w-5 fill-white hover:fill-yellow-200" xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512">
+                    <path
+                        d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
+                </svg>
+                <div class="text-white me-6">
+                    <p class="mb-1 demandante">{{ demandantes.nome }}</p>
+                    <p class="demandante">{{ demandantes.email }}</p>
+                    <!-- <p class="mb-1"><b>Nome: </b>{{ dados.nome }}</p>
                 <p><b>Email: </b>{{ dados.email }}</p> -->
+                </div>
             </div>
         </div>
         <nav class="bg-gray-600 text-white">
@@ -20,8 +27,7 @@
                     class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
                     aria-controls="navbar-default" aria-expanded="false">
                     <span class="sr-only">Abrir menu principal</span>
-                    <svg class="w-5 h-5"  xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 17 14">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M1 1h15M1 7h15M1 13h15" />
                     </svg>
@@ -35,8 +41,8 @@
                                 class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
                                 aria-current="page">
                                 <router-link to="/">
-                                    <svg class="ms-1 h-5 w-5 fill-white hover:fill-yellow-200"
-                                        viewBox="0 0 576 512" alt="Início"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                                    <svg class="ms-1 h-5 w-5 fill-white hover:fill-yellow-200" viewBox="0 0 576 512"
+                                        alt="Início">
                                         <path
                                             d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1v16.2c0 22.1-17.9 40-40 40h-16c-1.1 0-2.2 0-3.3-.1-1.4.1-2.8.1-4.2.1L416 512h-24c-22.1 0-40-17.9-40-40v-88c0-17.7-14.3-32-32-32h-64c-17.7 0-32 14.3-32 32v88c0 22.1-17.9 40-40 40h-55.9c-1.5 0-3-.1-4.5-.2-1.2.1-2.4.2-3.6.2h-16c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9.1-2.8v-69.7h-32c-18 0-32-14-32-32.1 0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7l255.4 224.5c8 7 12 15 11 24z" />
                                     </svg>
@@ -44,7 +50,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#"
+                            <a 
                                 class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
                                 aria-current="page">
                                 <router-link to="/registros">Registros</router-link>
@@ -75,9 +81,7 @@
 </template>
 
 <script setup>
-// import { dados } from '../../js/store.js'
-
-
+import { demandantes } from '@/stores/demandantes.js'
 </script>
 
 <style lang="scss" scoped>

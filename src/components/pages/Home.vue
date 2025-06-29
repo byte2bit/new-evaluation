@@ -14,7 +14,6 @@
 import ListCheckboxes from '../ListCheckboxes.vue'
 import Form from './Form.vue';
 
-
 </script>
 
 <style lang="scss" scoped>
