@@ -20,7 +20,7 @@
             <input class="w-1/4" type="text" v-model="searchValue">
         </div>
 
-        <EasyDataTable class="my-4" show-index id="tabela" :headers="header" :items="colabs"
+        <EasyDataTable class="my-4" show-index id="tabela" :headers="header" :items="colabStore.colabs"
             v-model:items-selected="itemsSelected" rowsPerPageMessage="linhas por página:"
             rowsOfPageSeparatorMessage="de" emptyMessage="Não há dados disponíveis" :buttons-pagination="true"
             :search-value="searchValue" alternating>
@@ -83,19 +83,22 @@ import { Modal } from 'flowbite'
 
 import { useGetColabStore } from '@/stores/getColabStore'
 const colabStore = useGetColabStore()
+const colabs = ref([])
 
 //dados do demandante
 import { demandantes } from '@/stores/demandantes.js'
 const admin = ref(demandantes.admin)
-const email = ref(demandantes.email)
+// const email = ref(demandantes.email)
 
 onMounted(async () => {
     await colabStore.getColabs()
+    colabs.value = colabStore.colabs.value
+
 })
 
-onMounted(() => {
+/* onMounted(() => {
     loadColabs()
-})
+}) */
 
 const searchValue = ref("")
 const headersBase = [
@@ -115,7 +118,7 @@ const header = computed(() => {
         : headersBase
 })
 
-const colabs = ref([])
+
 const itemsSelected = ref([])
 const colabName = ref("")
 const colabId = ref("")
@@ -127,7 +130,7 @@ function notify() {
     })
 }
 
-function loadColabs() {
+/* function loadColabs() {
     try {
         if (admin.value) {
             colabs.value = regs.value
@@ -137,7 +140,7 @@ function loadColabs() {
             )
         }
     } catch { (() => toast.error("Erro ao carregar registros")) }
-}
+} */
 
 function deleteItem() {
     colabs.value = colabs.value.filter((item) => item.id !== colabId.value)

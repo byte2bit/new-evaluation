@@ -40,7 +40,7 @@
       <Excel />
     </div>
 
-    <EasyDataTable show-index id="tabela" :fixed-header="true" :headers="header" :items="colabcUser"
+    <EasyDataTable show-index id="tabela" :fixed-header="true" :headers="header" :items="regs"
       :buttons-pagination="true" :hide-rows-per-page="true" :search-value="searchValue"
       rowsPerPageMessage="linhas por página:" rowsOfPageSeparatorMessage="de"
       emptyMessage="Não há registros disponíveis" alternating>
@@ -96,7 +96,6 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import axios from "axios";
 import EasyDataTable from "vue3-easy-data-table";
 import "vue3-easy-data-table/dist/style.css";
 import "vue3-toastify/dist/index.css";
@@ -113,19 +112,13 @@ const { regs, pagedRegs, page, limit } = storeToRefs(regStore)
 //dados do demandante
 import { demandantes } from '@/stores/demandantes.js'
 const admin = ref(demandantes.admin)
-const email = ref(demandantes.email)
 
 onMounted(async () => {
   await regStore.getRegs()
 })
 
-onMounted(() => {
-  loadRegs()
-});
-
 const searchValue = ref("");
 const colabcUser = ref([]);
-const registros = ref([]);
 const registro = ref("");
 const lReg = ref({});
 const regId = ref("");
@@ -163,26 +156,6 @@ function notify() {
   });
 }
 
-function loadRegs() {
-  try {
-    if (admin.value) {
-      colabcUser.value = regs.value
-    } else {
-      colabcUser.value = regs.value.filter(
-        (registro) => registro.demandante === email.value
-      )
-    }
-  } catch { (() => toast.error("Erro ao carregar registros")) }
-
-  // converte data
-  regs.value.forEach((registro) => {
-    let a = registro.created_at.split("T")[0];
-    let d = a.split("-");
-    let dat = d[2] + "/" + d[1] + "/" + d[0];
-    registro.created_at = dat;
-  })
-}
-
 function openModal(registroItem) {
   const modal = new Modal(document.getElementById("sub-modal-reg-del"));
   modal.show();
@@ -196,6 +169,9 @@ function closeModal() {
   modal.hide();
 }
 
+onMounted(() => {
+  colabcUser.value = regStore.regs
+})
 /* function deleteItem() {
   registros.value = registros.value.filter((item) => item.id !== regId.value);
 

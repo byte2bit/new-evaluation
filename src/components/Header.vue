@@ -63,7 +63,7 @@
                                 <router-link to="/colabs">Lista de profissionais</router-link>
                             </a>
                         </li>
-                        <li>
+                        <li v-if="admin">
                             <a href="#"
                                 class="block py-2 px-3 text-white rounded-sm  md:border-0 hover:text-yellow-200 md:p-0  ">
                                 <!-- <router-link v-if="admin" to="/inserir">Inserir profissional</router-link> -->
@@ -80,7 +80,9 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { demandantes } from '@/stores/demandantes.js'
+const admin = ref(demandantes.admin)
 </script>
 
 <style lang="scss" scoped>

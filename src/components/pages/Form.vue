@@ -1,4 +1,6 @@
 <script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
+
 import ListCheckboxes from '../ListCheckboxes.vue'
 import Respon from './form/Respon.vue'
 import Dispon from './form/Dispon.vue'
@@ -7,23 +9,22 @@ import Prazo from './form/Prazo.vue'
 import { Modal } from 'flowbite'
 
 import ChecksModal from '../utils/ChecksModal.vue'
-import { ref, reactive, computed, onMounted, watch } from 'vue'
 
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import "vue3-select-component/dist/style.css"
 
 
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/css/index.css';
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/css/index.css'
 
 // Stores
-import { useGetColabStore } from '@/stores/getColabStore'
+import { useGetCheckStore } from '@/stores/getCheckboxesStore'
 import { usePostColabStore } from '@/stores/postColabStore'
 import { storeToRefs } from 'pinia'
 
-const { chkColabs } = storeToRefs(useGetColabStore)
-const colabStore = useGetColabStore()
+const { chkColabs } = storeToRefs(useGetCheckStore)
+const colabStore = useGetCheckStore()
 const postStore = usePostColabStore()
 
 function openChecksModal() {
