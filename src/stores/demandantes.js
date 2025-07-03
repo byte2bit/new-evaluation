@@ -1,83 +1,69 @@
 // import { ref } from 'vue'
 
 var currentUser = ""
-var dados = {}
+var demandantes = {}
 
 let parentUrl = document.referrer
 let cUser = parentUrl.split("=")
 // currentUser = cUser[1]
-currentUser = "silvio.avaliacao"
+currentUser = "rodrigomrebello"
 
 switch (currentUser) {
     case "silvio.avaliacao":
-        dados = {
+        demandantes = {
             nome: "Silvio Ribeiro",
             email: "silvio.ribeiro@gmail.com",
             admin: true
         }
         break;
-    case "yuri.avaliacao":
-        dados = {
-            nome: "Yuri Felipe",
-            email: "yuri.felipe@nucleoengenharia.com.br",
-            admin: true
-        }
-        break;
-    case "fabiano.avaliacao":
-        dados = {
-            nome: "Fabiano Silva",
-            email: "fabiano.silva@nucleoengenharia.com.br",
-            admin: true
-        }
-        break;
     case "bernardo.avaliacao":
-        dados = {
+        demandantes = {
             nome: "Bernardo Santos",
             email: "bernardo.santos@nucleoengenharia.com.br",
             admin: true
         }
         break;
     case "mayconlacorte":
-        dados = {
+        demandantes = {
             nome: "Maycon Lacorte",
             email: "mayconlacorte@petrobras.com.br",
             admin: false
         }
         break;
     case "thiago.ramalho":
-        dados = {
+        demandantes = {
             nome: "Thiago Ramalho",
             email: "thiago.ramalho@petrobras.com.br",
             admin: false
         }
         break;
     case "elisangela.valdo":
-        dados = {
+        demandantes = {
             nome: "Elisangela Valdo",
             email: "elisangela.valdo@petrobras.com.br",
             admin: false
         }
         break;
     case "rodrigomrebello":
-        dados = {
+        demandantes = {
             nome: "Rodrigo Rebello",
             email: "rodrigomrebello@petrobras.com.br",
             admin: false
         }
         break;
     case "estevao.domingues":
-        dados = {
+        demandantes = {
             nome: "Estevão Domingues Costa",
             email: "estevao.domingues@petrobras.com.br",
             admin: false
         }
         break;
     default:
-        dados = {
+        demandantes = {
             nome: "Não localizado",
             email: "Não localizado",
         }
         break;
 }
 
-export { currentUser, dados }
+export { currentUser, demandantes }

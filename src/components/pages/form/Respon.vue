@@ -2,7 +2,7 @@
 
     <div class="flex flex-col w-full md:w-1/4 p-4 bg-zinc-200 rounded-md">
         <div class="star-title">
-            <p>Com relação a responsabilidade de profissionais atendendo
+            <p>Com relação a <b>responsabilidade</b> de profissionais atendendo
                 ao posto de serviço, qual seu nível de satisfação?</p>
         </div>
         <div>

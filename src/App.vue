@@ -1,6 +1,5 @@
 <script setup>
-import Home from './components/pages/Home.vue';
-import Header from './template/Header.vue'
+import Header from './components/Header.vue'
 </script>
 
 <template>
@@ -10,16 +9,19 @@ import Header from './template/Header.vue'
         <Header />
       </nav>
     </header>
-    <Home />
-    <footer id="footer" class="bg-gray-800 text-center text-white text-sm m-0 p-1">&copy; Núcleo Engenharia </footer>
+    <div class="mt-20" id="main">
+      <router-view></router-view>
+      <footer id="footer" class="bg-gray-800 text-center text-white text-sm m-0 p-1">&copy; Núcleo Engenharia </footer>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .content {
-  min-width: 100vw;
+  width: 100vw;
+  max-width: 100vw;
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 1fr;
 }
 
 header {

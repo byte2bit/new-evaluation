@@ -1,0 +1,22 @@
+CREATE TABLE `registros` (
+    `id` int unsigned NOT NULL AUTO_INCREMENT,
+    `colab` varchar(255) NOT NULL,
+    `avaliacao` varchar(255) NOT NULL,
+    `nivel` varchar(255) NOT NULL,
+    `desconto` varchar(255) NOT NULL,
+    `demandante` varchar(255) NOT NULL,
+    `liderancas` varchar(255) DEFAULT NULL,
+    `nota_qualidade` varchar(255) NOT NULL,
+    `obs_qualidade` varchar(255) NOT NULL,
+    `nota_prazo` varchar(255) NOT NULL,
+    `obs_prazo` varchar(255) NOT NULL,
+    `nota_dispon` varchar(255) NOT NULL,
+    `obs_dispon` varchar(255) NOT NULL,
+    `nota_respon` varchar(255) NOT NULL,
+    `obs_respon` varchar(255) NOT NULL,
+    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `itensQualidade` varchar(255) DEFAULT NULL,
+    `itensDispon` varchar(255) DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = MyISAM AUTO_INCREMENT = 451 DEFAULT CHARSET = utf8mb3

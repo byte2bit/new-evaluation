@@ -1,62 +1,89 @@
 <template>
     <div>
-        <!-- Seleciona todos -->
-        <input type="checkbox" @click="toggleAllSelection" :checked="allCheckBoxesSelected"
-            class="w-3 h-3 accent-pink-500">
-        <label class="ms-2 font-bold">Todos</label>
-
-        <!-- Lista de checkboxes -->
-        <div v-for="colab in colabStore.colabs" :key="colab.colab" class="line-colabs">
-            <input type="checkbox" :id="`checkbox-${colab.colab}`" class="w-3 h-3 accent-pink-500"
-                :checked="selectedColabs.includes(colab.colab)" @change="toggleColabSelection(colab.colab)">
-
-            <label v-memo="colab.colab" :for="`checkbox-${colab.colab}`" class="ms-2">
-                {{ colab.colab }}
-            </label>
+        <div v-if="colabStore.isLoading" class="flex justify-center items-center py-8">
+            <span>Carregando lista de colaboradores...</span>
         </div>
+        <template v-else>
+            <!-- Seleciona todos -->
+            <input type="checkbox" @click="toggleAllSelection" :checked="allCheckBoxesSelected"
+                class="w-3 h-3 accent-pink-500">
+            <label class="ms-2 font-bold">Todos</label>
 
+            <!-- Lista de checkboxes -->
+            <div v-for="(colab, index) in colabs" :key="index" class="line-colabs">
+                <input type="checkbox" :id="`checkbox-${colab.colab}`" class="w-3 h-3 accent-pink-500"
+                    :checked="selectedColabs.includes(colab.colab)" 
+                    @change="toggleColabSelection(colab.colab)">
+
+                <label v-memo="colab.colab" :for="`checkbox-${colab.colab}`" class="ms-2">
+                    {{ colab.colab }}
+                </label>
+            </div>  
+        </template>
     </div>
 </template>
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-import { useColabStore } from '@/stores/colabStore'
+import { useGetColabStore } from '@/stores/getColabStore'
+const colabStore = useGetColabStore()
 
-const colabStore = useColabStore()
+//dados do demandante
+import { demandantes } from '@/stores/demandantes.js'
+const admin = ref(demandantes.admin)
+const email = ref(demandantes.email)
+
+const colabs = ref([])
+
+onMounted(async () => {
+    await colabStore.getColabs()
+})
+
+function loadColabs() {
+    try {
+        if (admin.value) {
+            colabs.value = colabStore.colabs
+        } else {
+            colabs.value = colabStore.colabs.filter(
+                (registro) => registro.demandante === email.value
+            )
+        }
+    } catch { (() => toast.error("Erro ao carregar registros")) }
+}
+
+onMounted(() => {
+    loadColabs()
+})
+
 const selectedColabs = ref([])
 
 const allCheckBoxesSelected = computed(() =>
-    selectedColabs.value.length === colabStore.colabs.length &&
-    colabStore.colabs.length > 0
+    selectedColabs.value.length === colabs.value.length && colabs.value.length > 0
 )
 
 function toggleAllSelection() {
     if (allCheckBoxesSelected.value) {
         selectedColabs.value = []
     } else {
-        selectedColabs.value = colabStore.colabs.map(c => c.colab)
+        selectedColabs.value = colabs.value.map(colab => colab.colab)
     }
     updateStore()
 }
 
-function toggleColabSelection(colabName) {
-    const index = selectedColabs.value.indexOf(colabName)
+function toggleColabSelection(colabId) {
+    const index = selectedColabs.value.indexOf(colabId)
     if (index > -1) {
         selectedColabs.value.splice(index, 1)
     } else {
-        selectedColabs.value.push(colabName)
+        selectedColabs.value.push(colabId)
     }
     updateStore()
 }
 
 function updateStore() {
     colabStore.chkColabs = [...selectedColabs.value]
-    console.log('Selected Colabs:', colabStore.chkColabs)
 }
 
-onMounted(() => {
-    colabStore.loadColabs()
-})
 </script>
 
 
