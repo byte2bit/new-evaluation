@@ -37,9 +37,10 @@ const colabs = ref([])
 
 onMounted(async () => {
     await colabStore.getColabs()
+    colabs.value = colabStore.colabs
 })
 
-function loadColabs() {
+/* function loadColabs() {
     try {
         if (admin.value) {
             colabs.value = colabStore.colabs
@@ -49,12 +50,13 @@ function loadColabs() {
             )
         }
     } catch { (() => toast.error("Erro ao carregar registros")) }
-}
+} */
 
-onMounted(() => {
-    loadColabs()
+/* onMounted(() => {
+    // loadColabs()
+    colabs.value = colabStore.colabs
 })
-
+ */
 const selectedColabs = ref([])
 
 const allCheckBoxesSelected = computed(() =>
