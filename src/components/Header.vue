@@ -1,5 +1,5 @@
 <template>
-    <header>
+    <header class="fixed top-0 right-0 left-0 z-10">
         <div class="flex justify-between items-center p-2 bg-white border-gray-200 dark:bg-gray-900">
             <img src="@/assets/logo-horizontal branco.png" class="h-6" alt="Núcleo Logo" />
             <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
@@ -50,8 +50,7 @@
                             </a>
                         </li>
                         <li>
-                            <a 
-                                class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
+                            <a class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
                                 aria-current="page">
                                 <router-link to="/registros">Registros</router-link>
                             </a>
@@ -87,7 +86,6 @@ import { demandantes } from '@/stores/demandantes.js'
 <style lang="scss" scoped>
 
 header {
-
     p {
         margin-bottom: 4px;
         font-size: 0.7rem;

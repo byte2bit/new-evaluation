@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="colabStore.isLoading" class="flex justify-center items-center py-8">
-            <span>Carregando colaboradores...</span>
+            <span>Carregando lista de colaboradores...</span>
         </div>
         <template v-else>
             <!-- Seleciona todos -->
@@ -10,7 +10,7 @@
             <label class="ms-2 font-bold">Todos</label>
 
             <!-- Lista de checkboxes -->
-            <div v-for="(colab, index) in colabStore.colabs" :key="index" class="line-colabs">
+            <div v-for="(colab, index) in colabs" :key="index" class="line-colabs">
                 <input type="checkbox" :id="`checkbox-${colab.colab}`" class="w-3 h-3 accent-pink-500"
                     :checked="selectedColabs.includes(colab.colab)" 
                     @change="toggleColabSelection(colab.colab)">
@@ -25,20 +25,47 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-import { useColabStore } from '@/stores/colabStore'
+import { useGetColabStore } from '@/stores/getColabStore'
+const colabStore = useGetColabStore()
 
-const colabStore = useColabStore()
+//dados do demandante
+import { demandantes } from '@/stores/demandantes.js'
+const admin = ref(demandantes.admin)
+const email = ref(demandantes.email)
+
+const colabs = ref([])
+
+onMounted(async () => {
+    await colabStore.getColabs()
+})
+
+function loadColabs() {
+    try {
+        if (admin.value) {
+            colabs.value = colabStore.colabs
+        } else {
+            colabs.value = colabStore.colabs.filter(
+                (registro) => registro.demandante === email.value
+            )
+        }
+    } catch { (() => toast.error("Erro ao carregar registros")) }
+}
+
+onMounted(() => {
+    loadColabs()
+})
+
 const selectedColabs = ref([])
 
 const allCheckBoxesSelected = computed(() =>
-    selectedColabs.value.length === colabStore.colabs.length && colabStore.colabs.length > 0
+    selectedColabs.value.length === colabs.value.length && colabs.value.length > 0
 )
 
 function toggleAllSelection() {
     if (allCheckBoxesSelected.value) {
         selectedColabs.value = []
     } else {
-        selectedColabs.value = colabStore.colabs.map(colab => colab.colab)
+        selectedColabs.value = colabs.value.map(colab => colab.colab)
     }
     updateStore()
 }
@@ -57,9 +84,6 @@ function updateStore() {
     colabStore.chkColabs = [...selectedColabs.value]
 }
 
-onMounted(() => {
-    colabStore.loadColabs()
-})
 </script>
 
 

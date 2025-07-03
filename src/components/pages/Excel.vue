@@ -1,62 +1,51 @@
-<script>
+<script setup>
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import exportFromJSON from "export-from-json"
+// import exportFromJSON from "export-from-json"
 import { excelParser } from "../utils/excel-parser"
 import { demandantes } from '@/stores/demandantes.js'
 
-export default {
-    data() {
-        return {
-            admin: demandantes.admin,
-            demandantes: {},
-            colabcUser: [],
-            listData: [],
-        }
-    },
-    component: {
-        exportFromJSON, 
-        excelParser,
-        demandantes
-    },
-    methods: {
-        loadRegs() {
-            axios.get("registros")
-                .then(res => {
-                    this.listData = res.data
+const admin = demandantes.admin
+const colabcUser = ref([])
+const listData = ref([])
 
-                    this.colabcUser = this.listData.filter(registro => registro.demandante === demandantes.email)
+function loadRegs() {
+    axios.get("registros")
+        .then(res => {
+            listData.value = res.data
 
-                    var data = this.listData.map((registro => {
-                        let a = registro.created_at.split("T")[0]
-                        let d = a.split("-")
-                        let dat = d[2] + "/" + d[1] + "/" + d[0]
+            colabcUser.value = listData.value.filter(registro => registro.demandante === demandantes.email)
 
-                        registro.created_at = dat
-
-                        return (registro.created_at)
-                    }))
-
-                }).catch("Erro")
-        },
-        exportData() {
-            excelParser().exportDataFromJSON(this.listData, null, null);
-        },
-    },
-    mounted() {
-        this.loadRegs()
-    }
+            // Formata a data
+            listData.value.forEach(registro => {
+                let a = registro.created_at.split("T")[0]
+                let d = a.split("-")
+                let dat = d[2] + "/" + d[1] + "/" + d[0]
+                registro.created_at = dat
+            })
+        })
+        .catch(() => console.error("Erro"))
 }
+
+function exportData() {
+    excelParser().exportDataFromJSON(listData.value, null, null)
+}
+
+onMounted(() => {
+    loadRegs()
+})
 </script>
 
 <template>
     <div v-if="admin" id="exportar">
-
-        <button class="btn btn-primary btn-sm" @click="exportData">Exportar XLS</button>
-        
+        <button
+            class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm p-2 text-center cursor-pointer"
+            @click="exportData">Exportar XLS</button>
     </div>
 </template>
-<style lang="scss" scoped>  
-button{
+
+<style lang="scss" scoped>
+button {
     width: 100px;
 }
 </style>

@@ -6,32 +6,7 @@ import { demandantes } from '@/stores/demandantes.js'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
-export const useColabStore = defineStore('colabs', () => {
-    const chkColabs = ref([])
-    const colabs = ref([])
-    const isLoading = ref(false)
-
-    // Carrega colaboradores da API
-    const loadColabs = async () => {
-        isLoading.value = true
-        try {
-            const res = await axios.get("/colab")
-            colabs.value = res.data
-        } catch (e) {
-            console.error("Erro ao carregar colaboradores", e)
-        } finally {
-            isLoading.value = false
-        }
-    }
-    return {
-        chkColabs,
-        loadColabs,
-        colabs,
-        isLoading,
-    }
-})
-
-export const usePostColabStore = defineStore('postColab', () => {
+export const usePostRegstore = defineStore('postRegstore', () => {
 
     const submitState = reactive({
         isLoading: false,
@@ -39,12 +14,12 @@ export const usePostColabStore = defineStore('postColab', () => {
         success: false
     })
 
-    const saveColabs = async (dados) => {
+    const saveRegs = async (dados) => {
         submitState.isLoading = true
         submitState.error = null
 
         try {
-            // console.log("dados saveColabs: " + JSON.stringify(dados))
+            // console.log("dados saveRegs: " + JSON.stringify(dados))
 
             var regMail = {}
             var c = []
@@ -126,7 +101,7 @@ export const usePostColabStore = defineStore('postColab', () => {
     }
     return {
         submitState,
-        saveColabs,
+        saveRegs,
     }
 
 })
