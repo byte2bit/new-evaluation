@@ -43,43 +43,45 @@ export const usePostRegstore = defineStore('postRegstore', () => {
                     "itensDispon": dados.itensDispon
                 }
             })
-             await axios.all([
-                 axios.post("mail2", regMail),
-                 dados.colab.forEach(colab => {
-                     var reg = {
-                         "colab": colab.colab,
-                         "desconto": dados.desconto,
-                         "nivel": dados.nivel,
-                         "avaliacao": dados.avaliacao,
-                         "nota_qualidade": dados.nota_qualidade,
-                         "obs_qualidade": dados.obs_qualidade,
-                         "nota_prazo": dados.nota_prazo,
-                         "obs_prazo": dados.obs_prazo,
-                         "nota_dispon": dados.nota_dispon,
-                         "obs_dispon": dados.obs_dispon,
-                         "nota_respon": dados.nota_respon,
-                         "obs_respon": dados.obs_respon,
-                         "demandante": demandantes.nome,
-                         "liderancas": colab.liderancas,
-                         "itensQualidade": dados.itensQualidade,
-                         "itensDispon": dados.itensDispon
-                     }
-                     axios.post("registros", reg)
-                    //  console.log(reg)
-                 })
-             ])
-            // console.log("regMail: ", regMail)
+            await axios.all([
+                //envio dos emails
+                axios.post("mail2", regMail),
 
-            toast.success('Avaliação realizada com sucesso!', {
-                position: 'top-center',
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: true,
-                progress: undefined,
-                theme: 'colored',
-            })
+                //envio do registro para o banco
+                dados.colab.forEach(colab => {
+                    var reg = {
+                        "colab": colab.colab,
+                        "desconto": dados.desconto,
+                        "nivel": dados.nivel,
+                        "avaliacao": dados.avaliacao,
+                        "nota_qualidade": dados.nota_qualidade,
+                        "obs_qualidade": dados.obs_qualidade,
+                        "nota_prazo": dados.nota_prazo,
+                        "obs_prazo": dados.obs_prazo,
+                        "nota_dispon": dados.nota_dispon,
+                        "obs_dispon": dados.obs_dispon,
+                        "nota_respon": dados.nota_respon,
+                        "obs_respon": dados.obs_respon,
+                        "demandante": demandantes.email,
+                        "liderancas": colab.liderancas,
+                        "itensQualidade": dados.itensQualidade,
+                        "itensDispon": dados.itensDispon
+                    }
+                    axios.post("registros", reg)
+                    //  console.log(reg)
+                }),
+
+                toast.success('Avaliação realizada com sucesso!', {
+                    position: 'top-center',
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                    theme: 'colored',
+                })
+            ])
             submitState.success = true
             // reset()
         } catch (error) {

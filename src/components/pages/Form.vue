@@ -150,7 +150,8 @@ var regCompleto = ref([])
 
 const save = () => {
     //junta demandantes e liderancas pra enviar pro BD
-    regCompleto.value = colabStore.colabs.filter(item => colabStore.chkColabs.includes(item.colab));
+    regCompleto.value = colabStore.colabs.filter(item => colabStore.chkColabs.includes(item.colab))
+    
     var reg = regCompleto.value.map(item => {
         return {
             colab: item.colab,

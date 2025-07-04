@@ -68,13 +68,11 @@
             </div>
         </teleport>
         <!-- FINAL MODAL -->
-
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import 'vue3-toastify/dist/index.css'
@@ -82,23 +80,20 @@ import { toast } from 'vue3-toastify'
 import { Modal } from 'flowbite'
 
 import { useGetColabStore } from '@/stores/getColabStore'
+import { useDelColabStore } from '@/stores/delColabStore'
 const colabStore = useGetColabStore()
+const delColabStore = useDelColabStore()
+
 const colabs = ref([])
 
 //dados do demandante
 import { demandantes } from '@/stores/demandantes.js'
 const admin = ref(demandantes.admin)
-// const email = ref(demandantes.email)
 
 onMounted(async () => {
     await colabStore.getColabs()
     colabs.value = colabStore.colabs.value
-
 })
-
-/* onMounted(() => {
-    loadColabs()
-}) */
 
 const searchValue = ref("")
 const headersBase = [
@@ -118,38 +113,14 @@ const header = computed(() => {
         : headersBase
 })
 
-
 const itemsSelected = ref([])
 const colabName = ref("")
 const colabId = ref("")
 
-function notify() {
-    toast.success("Profissional removido.", {
-        autoClose: 1000,
-        theme: 'colored',
-    })
-}
-
-/* function loadColabs() {
-    try {
-        if (admin.value) {
-            colabs.value = regs.value
-        } else {
-            colabs.value = regs.value.filter(
-                (registro) => registro.demandante === email.value
-            )
-        }
-    } catch { (() => toast.error("Erro ao carregar registros")) }
-} */
-
 function deleteItem() {
-    colabs.value = colabs.value.filter((item) => item.id !== colabId.value)
-    axios.delete(`colab/${colabId.value}`)
-        .then(() => {
-            notify()
-        })
-        .catch(() => toast.error("Erro ao remover profissional"))
+    delColabStore.delColabs(colabId.value)
 }
+
 function openModal(colab) {
     const modal = new Modal(document.getElementById("sub-modal-colabs-del"));
     modal.show();

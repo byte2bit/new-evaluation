@@ -12,7 +12,6 @@
             Início
           </div>
         </div>
-
       </router-link>
     </div>
 
@@ -43,11 +42,11 @@
     <EasyDataTable show-index id="tabela" :fixed-header="true" :headers="header" :items="regs"
       :buttons-pagination="true" :hide-rows-per-page="true" :search-value="searchValue"
       rowsPerPageMessage="linhas por página:" rowsOfPageSeparatorMessage="de"
-      emptyMessage="Não há registros disponíveis" alternating>
+      emptyMessage="Carregando registros..." alternating>
       <!--       :rows-per-page="limit"
       :current-page="page"
-      :server-items-length="regStore.totalRegs"
-      @update-page-items:current-page="regStore.setPage" -->
+      :server-items-length="getRegStore.totalRegs"
+      @update-page-items:current-page="getRegStore.setPage" -->
       <template #loading>
         <img src="@/assets/spinner.gif" alt="Carregando..." style="width: 100px; height: 80px;" />
       </template>
@@ -99,22 +98,24 @@ import { ref, onMounted, computed } from 'vue';
 import EasyDataTable from "vue3-easy-data-table";
 import "vue3-easy-data-table/dist/style.css";
 import "vue3-toastify/dist/index.css";
-import { toast } from "vue3-toastify"
 import { Modal } from 'flowbite'
 import Excel from "./Excel.vue"
 
 //stores
 import { storeToRefs } from 'pinia'
 import { useGetRegStore } from '@/stores/getRegStore.js'
-const regStore = useGetRegStore()
-const { regs, pagedRegs, page, limit } = storeToRefs(regStore)
+import { useDelRegStore } from '@/stores/delRegStore.js'
+const getRegStore = useGetRegStore()
+const delRegStore = useDelRegStore()
+
+const { regs } = storeToRefs(getRegStore)
 
 //dados do demandante
 import { demandantes } from '@/stores/demandantes.js'
 const admin = ref(demandantes.admin)
 
 onMounted(async () => {
-  await regStore.getRegs()
+  await getRegStore.getRegs()
 })
 
 const searchValue = ref("");
@@ -149,13 +150,6 @@ const header = computed(() => {
     : headersBase
 })
 
-function notify() {
-  toast.success("Registro removido.", {
-    autoClose: 1000,
-    theme: "colored",
-  });
-}
-
 function openModal(registroItem) {
   const modal = new Modal(document.getElementById("sub-modal-reg-del"));
   modal.show();
@@ -170,21 +164,12 @@ function closeModal() {
 }
 
 onMounted(() => {
-  colabcUser.value = regStore.regs
+  colabcUser.value = getRegStore.regs
 })
-/* function deleteItem() {
-  registros.value = registros.value.filter((item) => item.id !== regId.value);
 
-  axios
-    .delete(`registros/${regId.value}`)
-    .then(() => {
-      notify();
-      loadRegs();
-    })
-    .catch(() => toast.error("Erro ao remover registro"));
-} */
-
-
+function deleteItem() {
+  delRegStore.delRegs(regId.value)
+}
 </script>
 
 <style lang="scss" scoped>
