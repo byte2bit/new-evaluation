@@ -11,7 +11,7 @@ import Header from './components/Header.vue'
     </header>
     <div class="mt-20" id="main">
       <router-view></router-view>
-      <footer id="footer" class="bg-gray-800 text-center text-white text-sm m-0 p-1">&copy; Núcleo Engenharia </footer>
+      <footer id="footer" class="bg-gray-800 text-center text-white text-sm m-0 p-1">&copy; Núcleo Engenharia - V2.0 </footer>
     </div>
   </div>
 </template>

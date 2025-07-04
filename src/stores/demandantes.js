@@ -5,8 +5,8 @@ var demandantes = {}
 
 let parentUrl = document.referrer
 let cUser = parentUrl.split("=")
-// currentUser = cUser[1]
-currentUser = "mayconlacorte"
+currentUser = cUser[1]
+// currentUser = "mayconlacorte"
 
 switch (currentUser) {
     case "silvio.avaliacao":
