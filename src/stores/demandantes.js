@@ -1,12 +1,10 @@
-// import { ref } from 'vue'
-
 var currentUser = ""
 var demandantes = {}
 
 let parentUrl = document.referrer
 let cUser = parentUrl.split("=")
-currentUser = cUser[1]
-// currentUser = "mayconlacorte"
+// currentUser = cUser[1]
+currentUser = "mayconlacorte"
 
 switch (currentUser) {
     case "silvio.avaliacao":
@@ -23,6 +21,13 @@ switch (currentUser) {
             admin: true
         }
         break;
+    case "levy.rodrigues":
+        demandantes = {
+            nome: "Levy Farias Rodrigues",
+            email: "levy.rodrigues@nucleoengenharia.com.br",
+            admin: true
+        }
+        break;
     case "mayconlacorte":
         demandantes = {
             nome: "Maycon Lacorte",
@@ -30,13 +35,20 @@ switch (currentUser) {
             admin: false
         }
         break;
-    case "thiago.ramalho":
+    case "pedro.kronemberger":
+        demandantes = {
+            nome: "Pedro Roberto Monken Kronemberger",
+            email: "pedro.kronemberger@petrobras.com.br",
+            admin: false
+        }
+        break;
+/*     case "thiago.ramalho":
         demandantes = {
             nome: "Thiago Ramalho",
             email: "thiago.ramalho@petrobras.com.br",
             admin: false
         }
-        break;
+        break; */
     case "elisangela.valdo":
         demandantes = {
             nome: "Elisangela Valdo",

@@ -6,7 +6,7 @@ import { demandantes } from '@/stores/demandantes.js'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
-export const usePostRegstore = defineStore('postRegstore', () => {
+export const usePostRegStore = defineStore('postRegstore', () => {
 
     const submitState = reactive({
         isLoading: false,

@@ -39,14 +39,29 @@
       <Excel />
     </div>
 
-    <EasyDataTable show-index id="tabela" :fixed-header="true" :headers="header" :items="regs"
-      :buttons-pagination="true" :hide-rows-per-page="true" :search-value="searchValue"
-      rowsPerPageMessage="linhas por página:" rowsOfPageSeparatorMessage="de"
-      emptyMessage="Carregando registros..." alternating>
-      <!--       :rows-per-page="limit"
-      :current-page="page"
-      :server-items-length="getRegStore.totalRegs"
-      @update-page-items:current-page="getRegStore.setPage" -->
+    <EasyDataTable 
+      show-index 
+      id="tabela" 
+      :fixed-header="true" 
+      :headers="header" 
+      :items="getRegStore.regs"
+      :buttons-pagination="true" 
+      :hide-rows-per-page="true" 
+      :search-value="searchValue"
+      :current-page="getRegStore.page"
+      :server-items-length="getRegStore.total"
+      rowsPerPageMessage="linhas por página:" 
+      rowsOfPageSeparatorMessage="de"
+      emptyMessage="Aguarde..." 
+      @update-page-items:current-page="getRegStore.setPage"
+      alternating>
+      <!--
+        :pagination-options="paginationOptions"
+        @page-change="fetchData"
+      :header-item-class-name="headerItemClassNameFunction"
+      :body-row-class-name="bodyRowClassNameFunction"
+      :rows-per-page="getRegStore.limit"
+      -->
       <template #loading>
         <img src="@/assets/spinner.gif" alt="Carregando..." style="width: 100px; height: 80px;" />
       </template>
@@ -92,7 +107,7 @@
     <!-- FINAL MODAL -->
   </div>
 </template>
-
+ 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import EasyDataTable from "vue3-easy-data-table";
@@ -108,15 +123,29 @@ import { useDelRegStore } from '@/stores/delRegStore.js'
 const getRegStore = useGetRegStore()
 const delRegStore = useDelRegStore()
 
-const { regs } = storeToRefs(getRegStore)
-
 //dados do demandante
 import { demandantes } from '@/stores/demandantes.js'
 const admin = ref(demandantes.admin)
 
 onMounted(async () => {
-  await getRegStore.getRegs()
+  await getRegStore.getRegs(getRegStore.page, getRegStore.limit)
 })
+
+/* let paginationOptions = {
+  currentPage: 1,
+  rowsPerPage: 10,
+  totalRows: 0,
+} */
+
+/* const bodyRowClassNameFunction = (item) => {
+  if (item.score < 60) return 'fail-row';
+  return 'pass-row';
+};
+
+const headerItemClassNameFunction = (header) => {
+  if (header.value === 'score') return 'score-column';
+  return '';
+}; */
 
 const searchValue = ref("");
 const colabcUser = ref([]);

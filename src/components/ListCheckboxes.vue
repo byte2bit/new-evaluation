@@ -16,7 +16,7 @@
                     @change="toggleColabSelection(colab.colab)">
 
                 <label v-memo="colab.colab" :for="`checkbox-${colab.colab}`" class="ms-2">
-                    {{ colab.colab }}
+                    {{ ++index+' - '+colab.colab }}
                 </label>
             </div>  
         </template>

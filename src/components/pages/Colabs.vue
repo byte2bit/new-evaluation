@@ -21,8 +21,8 @@
         </div>
 
         <EasyDataTable class="my-4" show-index id="tabela" :headers="header" :items="colabStore.colabs"
-            v-model:items-selected="itemsSelected" rowsPerPageMessage="linhas por página:"
-            rowsOfPageSeparatorMessage="de" emptyMessage="Não há dados disponíveis" :buttons-pagination="true"
+            rowsPerPageMessage="linhas por página:"
+            rowsOfPageSeparatorMessage="de" emptyMessage="Aguarde..." :buttons-pagination="true"
             :search-value="searchValue" alternating>
             <template #loading>
                 <img src="@/assets/spinner.gif" alt="Carregando..." style="width: 100px; height: 80px;" />
@@ -113,7 +113,6 @@ const header = computed(() => {
         : headersBase
 })
 
-const itemsSelected = ref([])
 const colabName = ref("")
 const colabId = ref("")
 

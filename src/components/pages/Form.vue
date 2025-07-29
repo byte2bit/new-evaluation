@@ -20,12 +20,12 @@ import 'vue-loading-overlay/dist/css/index.css'
 
 // Stores
 import { useGetCheckStore } from '@/stores/getCheckboxesStore'
-import { usePostColabStore } from '@/stores/postColabStore'
+import { usePostRegStore } from '@/stores/postRegStore'
 import { storeToRefs } from 'pinia'
 
 const { chkColabs } = storeToRefs(useGetCheckStore)
 const colabStore = useGetCheckStore()
-const postStore = usePostColabStore()
+const postStore = usePostRegStore()
 
 function openChecksModal() {
     var modalsub = new Modal(document.getElementById('large-modal'))
@@ -160,7 +160,7 @@ const save = () => {
         }
     })
 
-    postStore.saveColabs({
+    postStore.saveRegs({
         desconto: desc.value.toString(),
         nivel: nivel.value.toString(),
         avaliacao: avaliacao.value.toString(),
