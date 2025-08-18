@@ -38,13 +38,13 @@ export const useGetRegStore = defineStore('getRegStore', () => {
     } */
     const getRegs = async () => {
         try {
-            const res = await axios.get(`/registros`)
+            const res = await axios.get(`/registros2/?page=3&limit=2`)
             let items = admin.value ? res.data : res.data.filter(
                 (registro) => registro.demandante === email.value
             )
             regs.value = items
             // regs.value = items.slice((newPage - 1) * newLimit, newPage * newLimit)
-            // total.value = res.data.total
+            total.value = res.data.total
             // page.value = newPage
             // limit.value = newLimit
 
@@ -54,6 +54,7 @@ export const useGetRegStore = defineStore('getRegStore', () => {
                 let dat = d[2] + "/" + d[1] + "/" + d[0];
                 registro.created_at = dat;
             })
+            console.log("regs.value: " + JSON.stringify(regs.value))
         } catch (e) {
             console.error("Erro ao carregar os registros", e)
         }

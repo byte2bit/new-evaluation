@@ -105,6 +105,8 @@
       </div>
     </teleport>
     <!-- FINAL MODAL -->
+     <p>Total registros: {{ getRegStore.total }}</p>
+     
   </div>
 </template>
  
