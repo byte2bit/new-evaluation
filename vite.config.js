@@ -12,6 +12,7 @@ export default defineConfig({
   // define: {
   //   __API_URL__: JSON.stringify(apiUrl),
   // },
+  base: "./",
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

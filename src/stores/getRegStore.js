@@ -14,7 +14,7 @@ export const useGetRegStore = defineStore('getRegStore', () => {
     const total = ref(0)
 
     // Carrega registros da API com paginação
- /*    const getRegs = async (newPage = 1, newLimit = limit.value) => {
+    const getRegs = async (newPage = 1, newLimit = limit.value) => {
         try {
             const res = await axios.get(`/registros2`)
             let items = admin.value ? res.data : res.data.filter(
@@ -35,7 +35,8 @@ export const useGetRegStore = defineStore('getRegStore', () => {
         } catch (e) {
             console.error("Erro ao carregar os registros", e)
         }
-    } */
+    }
+   /* 
     const getRegs = async () => {
         try {
             const res = await axios.get(`/registros2/?page=3&limit=2`)
@@ -58,7 +59,7 @@ export const useGetRegStore = defineStore('getRegStore', () => {
         } catch (e) {
             console.error("Erro ao carregar os registros", e)
         }
-    }
+    } */
 
     // Troca de página: chama getRegs com a nova página.
     function setPage(newPage) {

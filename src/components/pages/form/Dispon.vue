@@ -10,7 +10,7 @@
                 data-modal-target="sub-modal-dispon" />
             <div class="my-3 flex flex-col">
                 <label for="obs_dispon">Observações:</label>
-                <textarea v-sanitize="text" id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
+                <textarea v-sanitize id="obs_dispon" rows="3" v-model="postData.obs_dispon"></textarea>
             </div>
         </div>
 
@@ -61,35 +61,52 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import StarRating from 'vue-star-rating'
 import { Modal } from 'flowbite'
 
-const optDispon = defineModel('optDispon')
-const postData = defineModel('postData')
-const iDispon = ref([])
-const emit = defineEmits(['iDispon'])
-const text = ref("")
-var showError = ref(false)
+const props = defineProps({
+    optDispon: { type: Array, required: true },
+    postData: { type: Object, required: true }
+})
 
-watch(() => postData.value.nota_dispon, (newVal) => {
-    var modalsub = new Modal(document.getElementById('sub-modal-dispon'))
+const iDispon = ref([])
+const emit = defineEmits(['update:postData', 'iDispon'])
+const showError = ref(false)
+let modalInstance = null
+
+// Cria a instância do modal uma única vez quando o componente é montado
+onMounted(() => {
+    const modalElement = document.getElementById('sub-modal-dispon')
+    if (modalElement) {
+        modalInstance = new Modal(modalElement, { backdrop: 'static' })
+    }
+})
+
+// Garante que a instância do modal seja limpa ao sair do componente
+onBeforeUnmount(() => {
+    modalInstance?.hide()
+    modalInstance = null
+})
+
+watch(() => props.postData.nota_dispon, (newVal) => {
     if (newVal <= 3) {
-        modalsub.show()
+        modalInstance?.show()
     } else {
         iDispon.value = []
-        modalsub.hide()
+        emit('iDispon', [])
+        modalInstance?.hide()
     }
 })
 
 const closeModalD = () => {
-    if (postData.value.nota_dispon <= 3 && iDispon.value.length === 0) {
+    if (props.postData.nota_dispon <= 3 && iDispon.value.length === 0) {
         showError.value = true
+        return // Impede o fechamento do modal
     } else {
         showError.value = false
         emit('iDispon', iDispon.value)
-        var modal = new Modal(document.getElementById('sub-modal-dispon'))
-        modal.hide()
+        modalInstance?.hide()
     }
 }
 

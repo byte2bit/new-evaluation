@@ -11,18 +11,20 @@
 
             <div class="my-3 flex flex-col">
                 <label for="obs_respon">Observações:</label>
-                <textarea v-sanitize="text" id="obs_respon" rows="3" v-model="postData.obs_respon"></textarea>
+                <textarea v-sanitize id="obs_respon" rows="3" v-model="postData.obs_respon"></textarea>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import StarRating from 'vue-star-rating'
 
-const postData = defineModel('postData')
-const text = ref("")
+const props = defineProps({
+    postData: { type: Object, required: true }
+})
+
+const emit = defineEmits(['update:postData'])
 
 </script>
 

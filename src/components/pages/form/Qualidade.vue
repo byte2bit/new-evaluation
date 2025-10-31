@@ -5,12 +5,11 @@
                 Prestado?</p>
         </div>
         <div>
-            <star-rating v-model:rating="postData.nota_qualidade" :increment="0.5" active-border-color="#1a00ab"
-                active-color="#1a00ab" :star-size="25" data-modal-show="sub-modal-qualidade"
-                data-modal-target="sub-modal-qualidade" />
+            <star-rating v-model:rating="postData.nota_qualidade" :increment="0.5" active-border-color="#1a00ab" active-color="#1a00ab"
+                :star-size="25" />
             <div class="my-3 flex flex-col">
                 <label for="obs_qualidade">Observações:</label>
-                <textarea v-sanitize="text" id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
+                <textarea v-sanitize id="obs_qualidade" rows="3" v-model="postData.obs_qualidade"></textarea>
             </div>
         </div>
 
@@ -62,39 +61,58 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import StarRating from 'vue-star-rating'
 import { Modal } from 'flowbite'
 
-const optQualidade = defineModel('optQualidade')
-const postData = defineModel('postData')
-const iQualidade = ref([])
-const emit = defineEmits(['iQualidade'])
-const text = ref("")
-var showError = ref(false)
+const props = defineProps({
+    optQualidade: { type: Array, required: true },
+    postData: { type: Object, required: true }
+})
 
-watch(() => postData.value.nota_qualidade, (newVal) => {
-    var modalsub = new Modal(document.getElementById('sub-modal-qualidade'))
+const emit = defineEmits(['update:postData', 'iQualidade'])
+
+const iQualidade = ref([])
+const showError = ref(false)
+let modalInstance = null
+
+// Cria a instância do modal uma única vez quando o componente é montado
+onMounted(() => {
+    const modalElement = document.getElementById('sub-modal-qualidade')
+    if (modalElement) {
+        modalInstance = new Modal(modalElement, { backdrop: 'static' })
+    }
+})
+
+// Garante que a instância do modal seja limpa ao sair do componente
+onBeforeUnmount(() => {
+    modalInstance?.hide()
+    modalInstance = null
+})
+
+watch(() => props.postData.nota_qualidade, (newVal) => {
     if (newVal <= 3) {
-        modalsub.show()
+        // Apenas mostra o modal que já existe
+        modalInstance?.show()
     } else {
+        // Se a nota for alta, limpa os itens e emite o valor vazio para o pai
         iQualidade.value = []
-        modalsub.hide()
+        emit('iQualidade', [])
+        modalInstance?.hide()
     }
 })
 
 const closeModalQ = () => {
-    if (postData.value.nota_qualidade <= 3 && iQualidade.value.length === 0) {
+    // Validação: se a nota for baixa, pelo menos um item deve ser selecionado
+    if (props.postData.nota_qualidade <= 3 && iQualidade.value.length === 0) {
         showError.value = true
-    } else {
-        showError.value = false
-        emit('iQualidade', iQualidade.value)
-        const modal = new Modal(document.getElementById('sub-modal-qualidade'))
-        modal.hide()
-
+        return // Impede o fechamento do modal
     }
-}
 
+    showError.value = false
+    emit('iQualidade', iQualidade.value)
+    modalInstance?.hide()
+}
 </script>
 
 <style lang="scss" scoped> 

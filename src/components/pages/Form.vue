@@ -177,6 +177,7 @@ const save = () => {
         itensDispon: iDispon.value,
     })
     closeChecksModal()
+    reset()
 }
 
 function reset() {
@@ -201,7 +202,7 @@ function reset() {
 
     iQualidade.value = ''
     iDispon.value = ''
-    chkColabs.value = []
+    colabStore.chkColabs.value = []
 }
 
 onMounted(async () => {

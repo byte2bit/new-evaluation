@@ -4,7 +4,7 @@ var demandantes = {}
 let parentUrl = document.referrer
 let cUser = parentUrl.split("=")
 currentUser = cUser[1]
-// currentUser = "salgueiro"
+// currentUser = "silvio.avaliacao"
 
 switch (currentUser) {
     case "silvio.avaliacao":
@@ -28,13 +28,20 @@ switch (currentUser) {
             admin: true
         }
         break;
-    case "mayconlacorte":
+    case "thais.sena":
+        demandantes = {
+            nome: "Thais Matos de Sena",
+            email: "thais.sena@petrobras.com.br",
+            admin: false
+        }
+        break;
+/*     case "mayconlacorte":
         demandantes = {
             nome: "Maycon Lacorte",
             email: "mayconlacorte@petrobras.com.br",
             admin: false
         }
-        break;
+        break; */
     case "salgueiro":
         demandantes = {
             nome: "Francisco Salgueiro",
@@ -48,14 +55,14 @@ switch (currentUser) {
             email: "pedro.kronemberger@petrobras.com.br",
             admin: false
         }
-        break;
+        break; */
      case "thiago.ramalho":
         demandantes = {
             nome: "Thiago Ramalho",
             email: "thiago.ramalho@petrobras.com.br",
             admin: false
         }
-        break; */
+        break;
     case "elisangela.valdo":
         demandantes = {
             nome: "Elisangela Valdo",

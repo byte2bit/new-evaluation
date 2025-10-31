@@ -5,63 +5,39 @@
         </div>
         <template v-else>
             <!-- Seleciona todos -->
-            <input type="checkbox" @click="toggleAllSelection" :checked="allCheckBoxesSelected"
+            <input type="checkbox" @click="toggleAllSelection" :checked="allSelected"
                 class="w-3 h-3 accent-pink-500">
             <label class="ms-2 font-bold">Todos</label>
 
             <!-- Lista de checkboxes -->
-            <div v-for="(colab, index) in colabs" :key="index" class="line-colabs">
-                <input type="checkbox" :id="`checkbox-${colab.colab}`" class="w-3 h-3 accent-pink-500"
-                    :checked="selectedColabs.includes(colab.colab)" 
-                    @change="toggleColabSelection(colab.colab)">
-
-                <label v-memo="colab.colab" :for="`checkbox-${colab.colab}`" class="ms-2">
-                    {{ ++index+' - '+colab.colab }}
-                </label>
+            <div v-for="(colab, index) in colabStore.colabs" :key="index" class="line-colabs">
+                <input type="checkbox" :id="`checkbox-${colab.colab}`" class="w-3 h-3 accent-pink-500" :value="colab.colab"
+                    v-model="colabStore.chkColabs">
+                <label :for="`checkbox-${colab.colab}`" class="ms-2">{{ ++index + ' - ' + colab.colab }}</label>
             </div>  
         </template>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useGetCheckStore } from '@/stores/getCheckboxesStore'
 const colabStore = useGetCheckStore()
 
-const colabs = ref([])
-
 onMounted(async () => {
     await colabStore.getColabs()
-    colabs.value = colabStore.colabs
 })
 
-const selectedColabs = ref([])
-
-const allCheckBoxesSelected = computed(() =>
-    selectedColabs.value.length === colabs.value.length && colabs.value.length > 0
+const allSelected = computed(() =>
+    colabStore.colabs.length > 0 && colabStore.chkColabs.length === colabStore.colabs.length
 )
 
 function toggleAllSelection() {
-    if (allCheckBoxesSelected.value) {
-        selectedColabs.value = []
+    if (allSelected.value) {
+        colabStore.chkColabs = []
     } else {
-        selectedColabs.value = colabs.value.map(colab => colab.colab)
+        colabStore.chkColabs = colabStore.colabs.map(c => c.colab)
     }
-    updateStore()
-}
-
-function toggleColabSelection(colabId) {
-    const index = selectedColabs.value.indexOf(colabId)
-    if (index > -1) {
-        selectedColabs.value.splice(index, 1)
-    } else {
-        selectedColabs.value.push(colabId)
-    }
-    updateStore()
-}
-
-function updateStore() {
-    colabStore.chkColabs = [...selectedColabs.value]
 }
 
 </script>
