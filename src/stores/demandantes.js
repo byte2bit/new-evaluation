@@ -28,20 +28,20 @@ switch (currentUser) {
             admin: true
         }
         break;
-    case "thais.sena":
+/*     case "thais.sena":
         demandantes = {
             nome: "Thais Matos de Sena",
             email: "thais.sena@petrobras.com.br",
             admin: false
         }
-        break;
-/*     case "mayconlacorte":
+        break; */
+    case "mayconlacorte":
         demandantes = {
             nome: "Maycon Lacorte",
             email: "mayconlacorte@petrobras.com.br",
             admin: false
         }
-        break; */
+        break;
     case "salgueiro":
         demandantes = {
             nome: "Francisco Salgueiro",
