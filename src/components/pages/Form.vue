@@ -4,10 +4,15 @@ import Respon from './form/Respon.vue'
 import Dispon from './form/Dispon.vue'
 import Qualidade from './form/Qualidade.vue'
 import Prazo from './form/Prazo.vue'
+import TabelaResumoModal from './form/TabelaResumoModal.vue'
+import ChecksModal from '@/components/utils/ChecksModal.vue'
+import { useAvaliacao } from '@/composables/useAvaliacao'
+import { constants } from '@/utils/constants'
+
+import { ref, onMounted, onUnmounted } from 'vue'
+
 import { Modal } from 'flowbite'
 
-import ChecksModal from '../utils/ChecksModal.vue'
-import { ref, reactive, computed, onMounted, watch } from 'vue'
 
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
@@ -22,12 +27,17 @@ import { useGetColabStore } from '@/stores/getColabStore'
 import { usePostColabStore } from '@/stores/postColabStore'
 import { storeToRefs } from 'pinia'
 
-const { chkColabs } = storeToRefs(useGetColabStore)
 const colabStore = useGetColabStore()
 const postStore = usePostColabStore()
+const { chkColabs } = storeToRefs(colabStore)
+
+const isLoading = ref(false)
+const fullPage = ref(true)
+// const modalRef = ref(null)
+
+let checksModalInstance = null
 
 function openChecksModal() {
-    var modalsub = new Modal(document.getElementById('large-modal'))
     if (colabStore.chkColabs.length === 0) {
         toast.error("Selecione pelo menos um colaborador!", {
             position: 'bottom-left',
@@ -39,118 +49,29 @@ function openChecksModal() {
             progress: undefined,
             theme: 'colored',
         })
-        modalsub.hide()
+        if (checksModalInstance) checksModalInstance.hide()
     } else {
-        modalsub.show()
-        // showChecksModal.value = true
+        if (checksModalInstance) checksModalInstance.show()
     }
 }
 
 function closeChecksModal() {
-    var modalsub = new Modal(document.getElementById('large-modal'))
-    modalsub.hide()
-    // showChecksModal.value = false
+    if (checksModalInstance) checksModalInstance.hide()
 }
 
-var iQualidade = ref('')
-var iDispon = ref('')
-var isLoading = ref(false)
-var fullPage = ref(true)
+const {
+    postData, iQualidade, iDispon, avaliacao, nivel, desc, iQual, iDisp,
+    getOptQualidade, getOptDispon, resetAvaliacao
+} = useAvaliacao()
 
-const postData = reactive({
-    desconto: "",
-    nivel: "",
-    avaliacao: "",
-    nota_qualidade: 5,
-    obs_qualidade: "",
-    nota_prazo: 5,
-    obs_prazo: "",
-    nota_dispon: 5,
-    obs_dispon: "",
-    nota_respon: 5,
-    obs_respon: "",
-    colab: '',
-    demandante: '',
-    itensQualidade: '',
-    itensDispon: '',
-    liderancas: '',
-})
+const { optQualidade, optDispon } = constants()
 
-const optQualidade = ref([
-    { name: "Comportamento/Atitude: O profissional não demonstra comportamento adequado ou atitude positiva no atendimento.", id: 1 },
-    { name: "Forma de comunicação (Verbal/escrita, cordialidade): Falhas na comunicação, falta de cordialidade ou erros na comunicação escrita. ", id: 2 },
-    { name: "Habilidade no uso de sistemas informatizados e soluções tecnológicas no suporte: Dificuldades ou falhas no uso de sistemas e tecnologias. ", id: 3 },
-    { name: "Apoio a reuniões e eventos: Falta de suporte adequado ou problemas durante reuniões e eventos. ", id: 4 },
-    { name: "Atendimento a demandas: Demora ou falhas no atendimento das solicitações.", id: 5 },
-    { name: "Falta de conhecimentos básicos para as tarefas: Falta de domínio sobre as tarefas básicas relacionadas ao posto de serviço.", id: 6 },
-    { name: "Insuficiência de conhecimento, especialização ou experiência técnica necessária para o posto de serviço: Falta de conhecimento técnico, especialização ou experiência necessária.", id: 7 },
-])
 
-const optDispon = ref([
-    { name: "Posto indisponível por um dia ou mais.", id: 1 },
-    { name: "Frequência de atraso, indisponível no horário administrativo.", id: 2 },
-    { name: "O posto de Serviço estava indisponível em horário previsto para compromisso agendado da gerência.", id: 3 },
-])
-
-const avaliacao = computed(() => {
-    return (Number(postData.nota_qualidade) +
-        Number(postData.nota_prazo) +
-        Number(postData.nota_dispon) +
-        Number(postData.nota_respon)) / 4
-})
-
-const pontos = computed(() => {
-    const x = avaliacao.value
-    if (x <= 5 && x >= 4.5) return 0
-    if (x <= 4.4 && x >= 4) return 1
-    if (x <= 3.9 && x >= 3.5) return 5
-    if (x <= 3.4 && x >= 2.5) return 7
-    if (x <= 2.4 && x >= 1) return 10
-    return 0
-})
-const nivel = computed(() => {
-    const p = pontos.value
-    if (p === 0) return "A"
-    if (p === 1) return "B"
-    if (p === 5) return "C"
-    if (p === 7) return "D"
-    if (p === 10) return "E"
-    return ""
-})
-
-const desc = computed(() => {
-    const p = pontos.value
-
-    if (p === 0) return "0%"
-    if (p === 1) return "1%"
-    if (p === 5) return "2%"
-    if (p === 7) return "3%"
-    if (p === 10) return "5%"
-    return ""
-})
-
-const getOptQualidade = (opt) => {
-    iQualidade.value = opt.join(" | ")
-}
-
-const getOptDispon = (optd) => {
-    iDispon.value = optd.join(" | ")
-}
-
-const iQual = computed(() => {
-    return "&bullet; " + iQualidade.value.replaceAll(" | ", "<br>&bullet; ")
-})
-
-const iDisp = computed(() => {
-    return "&bullet; " + iDispon.value.replaceAll(" | ", "<br>&bullet; ")
-})
-
-var regCompleto = ref([])
-
-const save = () => {
+const save = async () => {
+    isLoading.value = true
     //junta demandantes e liderancas pra enviar pro BD
-    regCompleto.value = colabStore.colabs.filter(item => colabStore.chkColabs.includes(item.colab));
-    var reg = regCompleto.value.map(item => {
+    const regCompletoLocal = colabStore.colabs.filter(item => colabStore.chkColabs.includes(item.colab));
+    const reg = regCompletoLocal.map(item => {
         return {
             colab: item.colab,
             demandante: item.demandante,
@@ -158,52 +79,43 @@ const save = () => {
         }
     })
 
-    postStore.saveColabs({
-        desconto: desc.value.toString(),
-        nivel: nivel.value.toString(),
-        avaliacao: avaliacao.value.toString(),
-        nota_qualidade: postData.nota_qualidade.toString(),
-        obs_qualidade: postData.obs_qualidade,
-        nota_prazo: postData.nota_prazo.toString(),
-        obs_prazo: postData.obs_prazo,
-        nota_dispon: postData.nota_dispon.toString(),
-        obs_dispon: postData.obs_dispon,
-        nota_respon: postData.nota_respon.toString(),
-        obs_respon: postData.obs_respon,
-        colab: reg,
-        itensQualidade: iQualidade.value,
-        itensDispon: iDispon.value,
-    })
-    closeChecksModal()
-}
-
-function reset() {
-    Object.assign(postData, {
-        desconto: "",
-        nivel: "",
-        avaliacao: "",
-        nota_qualidade: 5,
-        obs_qualidade: "",
-        nota_prazo: 5,
-        obs_prazo: "",
-        nota_dispon: 5,
-        obs_dispon: "",
-        nota_respon: 5,
-        obs_respon: "",
-        colab: '',
-        demandante: '',
-        liderancas: '',
-        iQualidade: '',
-        iDispon: '',
-    })
-
-    iQualidade.value = ''
-    iDispon.value = ''
-    chkColabs.value = []
+    try {
+        await postStore.saveColabs({
+            desconto: desc.value?.toString() || "",
+            nivel: nivel.value?.toString() || "",
+            avaliacao: avaliacao.value?.toString() || "",
+            nota_qualidade: postData.nota_qualidade?.toString() || "",
+            obs_qualidade: postData.obs_qualidade || "",
+            nota_prazo: postData.nota_prazo?.toString() || "",
+            obs_prazo: postData.obs_prazo || "",
+            nota_dispon: postData.nota_dispon?.toString() || "",
+            obs_dispon: postData.obs_dispon || "",
+            nota_respon: postData.nota_respon?.toString() || "",
+            obs_respon: postData.obs_respon || "",
+            colab: reg,
+            itensQualidade: iQualidade.value,
+            itensDispon: iDispon.value,
+        })
+        toast.success("Avaliação salva com sucesso!")
+    } catch (error) {
+        toast.error("Erro ao salvar avaliação.")
+    } finally {
+        closeChecksModal()
+        isLoading.value = false
+    }
 }
 
 onMounted(async () => {
+    checksModalInstance = new Modal(document.getElementById('large-modal'))
+    // checksModalInstance = new Modal(modalRef.value.$el.querySelector('#large-modal'))
     await colabStore.getColabs()
+})
+
+onUnmounted(() => {
+    if (checksModalInstance) {
+        checksModalInstance.hide()
+        checksModalInstance = null
+    }
 })
 
 </script>
@@ -289,20 +201,15 @@ onMounted(async () => {
                         <div class="border-top mt-auto pb-3 flex justify-end items-center">
 
                             <!-- Modal toggle -->
-                            <button data-modal-target="large-modal" data-modal-toggle="large-modal"
-                                @click="openChecksModal"
+                            <button @click="openChecksModal"
                                 class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 text-center "
                                 type="button">
                                 Resumo
                             </button>
-
-                            <!--                     <button id="submit" type="submit"
-                        class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        Submeter Avaliação
-                    </button> -->
                         </div>
 
-                        <ChecksModal @enviar="save">
+                        <ChecksModal @enviar="save" @fechar="closeChecksModal">
+                        <!-- <ChecksModal ref="modalRef" @enviar="save" @fechar="closeChecksModal"> -->
                             <template #bodyModal>
                                 <div class="modal-dados flex">
 
@@ -319,108 +226,9 @@ onMounted(async () => {
                                         </div>
                                     </div>
 
-                                    <div id="dados">
-                                        <h2 class="mb-4 font-bold">Dados avaliados: </h2>
-                                        <table class="table-fixed text-sm text-left rtl:text-right text-gray-500">
-                                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                                <tr>
-                                                    <th scope="col" class="px-3 py-1">Item</th>
-                                                    <th scope="col" class="px-3 py-1">Nota / Avaliação</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Avaliação
-                                                        Média</td>
-                                                    <td class="px-3 py-1 text-sm">{{ avaliacao }}</td>
-                                                </tr>
-                                                <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Nível de
-                                                        Serviço</td>
-                                                    <td class="px-3 py-1 text-sm">{{ nivel }}</td>
-                                                </tr>
-                                                <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Desconto
-                                                        Percentual na Medição</td>
-                                                    <td class="px-3 py-1 text-sm">{{ desc }}</td>
-                                                </tr>
-                                                <!-- Opcionais -->
-                                                <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Como você
-                                                        avalia a qualidade do Serviço Prestado?</td>
-                                                    <td class="px-3 py-1 text-sm">{{ postData.nota_qualidade }}</td>
-                                                </tr>
-
-                                                <tr v-if="postData.obs_qualidade"
-                                                    class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Observações de Qualidade</td>
-                                                    <td class="px-3 py-1 text-sm">{{ postData.obs_qualidade }}</td>
-                                                </tr>
-
-                                                <tr v-if="iQualidade"
-                                                    class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Itens de qualidade não atendidos</td>
-                                                    <td class="px-3 py-1">
-                                                        <span class="text-sm" v-html="iQual"></span>
-                                                    </td>
-                                                </tr>
-
-                                                <tr v-if="postData.obs_prazo"
-                                                    class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Com relação ao atendimento no prazo das solicitações efetuadas
-                                                        ao
-                                                        Posto
-                                                        de Serviço, qual seu nível de satisfação?</td>
-                                                    <td class="px-3 py-1 text-sm">{{ postData.obs_prazo }}</td>
-                                                </tr>
-                                                <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Como você avalia a disponibilidade do Posto de Serviço no
-                                                        horário de
-                                                        serviço?</td>
-                                                    <td class="px-3 py-1 text-sm">{{ postData.nota_dispon }}</td>
-                                                </tr>
-                                                <tr v-if="postData.obs_dispon"
-                                                    class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Observações de Disponibilidade:</td>
-                                                    <td class="px-3 py-1 text-sm">{{ postData.obs_dispon }}</td>
-                                                </tr>
-
-                                                <tr v-if="iDispon"
-                                                    class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Itens de disponibilidade não atendidos</td>
-                                                    <td class="px-3 py-1">
-                                                        <span class="text-sm" v-html="iDisp"></span>
-                                                    </td>
-                                                </tr>
-
-                                                <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Com relação a responsabilidade de profissionais atendendo ao
-                                                        posto
-                                                        de
-                                                        serviço, qual seu nível de satisfação?</td>
-                                                    <td class="px-3 py-1 text-sm">{{ postData.nota_respon }}</td>
-                                                </tr>
-                                                <tr v-if="postData.obs_respon"
-                                                    class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
-                                                    <td scope="row" class="px-3 py-1 font-light text-sm text-gray-900">
-                                                        Observações de Responsabilidade</td>
-                                                    <td class="px-3 py-1 text-sm">{{ postData.obs_respon }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <!-- chkColabs no form: {{ colabStore.chkColabs }} -->
-                                    </div>
+                                    <TabelaResumoModal :avaliacao="avaliacao" :nivel="nivel" :desc="desc"
+                                        :postData="postData" :iQualidade="iQualidade" :iQual="iQual" :iDispon="iDispon"
+                                        :iDisp="iDisp" />
                                 </div>
                             </template>
                         </ChecksModal>
@@ -439,6 +247,7 @@ onMounted(async () => {
     display: grid;
     grid-template-columns: 300px 1fr;
 }
+
 #checks {
     height: calc(100vh - 170px);
     overflow: auto;
@@ -451,11 +260,6 @@ aside {
 .modal-dados p,
 .modal-dados ul li {
     font-size: 12px;
-}
-
-#dados p {
-    font-size: 1rem;
-    background-color: #fff;
 }
 
 .main {

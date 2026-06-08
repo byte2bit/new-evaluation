@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import StarRating from 'vue-star-rating'
 import { Modal } from 'flowbite'
 
@@ -70,15 +70,19 @@ const postData = defineModel('postData')
 const iDispon = ref([])
 const emit = defineEmits(['iDispon'])
 const text = ref("")
-var showError = ref(false)
+const showError = ref(false)
+let modalInstance = null
+
+onMounted(() => {
+    modalInstance = new Modal(document.getElementById('sub-modal-dispon'))
+})
 
 watch(() => postData.value.nota_dispon, (newVal) => {
-    var modalsub = new Modal(document.getElementById('sub-modal-dispon'))
     if (newVal <= 3) {
-        modalsub.show()
+        if (modalInstance) modalInstance.show()
     } else {
         iDispon.value = []
-        modalsub.hide()
+        if (modalInstance) modalInstance.hide()
     }
 })
 
@@ -88,13 +92,10 @@ const closeModalD = () => {
     } else {
         showError.value = false
         emit('iDispon', iDispon.value)
-        var modal = new Modal(document.getElementById('sub-modal-dispon'))
-        modal.hide()
+        if (modalInstance) modalInstance.hide()
     }
 }
 
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
