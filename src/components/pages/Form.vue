@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 
 import ListCheckboxes from '../ListCheckboxes.vue'
 import Respon from './form/Respon.vue'
@@ -10,8 +10,6 @@ import TabelaResumoModal from './form/TabelaResumoModal.vue'
 import ChecksModal from '@/components/utils/ChecksModal.vue'
 import { useAvaliacao } from '@/composables/useAvaliacao'
 import { constants } from '@/utils/constants'
-
-import { ref, onMounted, onUnmounted } from 'vue'
 
 import { Modal } from 'flowbite'
 
