@@ -1,44 +1,75 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from "vue"
+import { ref } from "vue"
 import axios from 'axios'
 import "@/plugins/axios"
+
+import { demandantes } from '@/stores/demandantes.js'
+const admin = ref(demandantes.admin)
+const email = ref(demandantes.email)
 
 export const useGetRegStore = defineStore('getRegStore', () => {
     const regs = ref([])
     const limit = ref(25)
     const page = ref(1)
-    const totalPages = computed(() => Math.ceil(regs.value.length / limit.value))
-    const totalRegs = computed(() => regs.value.length)
+    const total = ref(0)
 
-    // Carrega todos os registros da API
+    // Carrega registros da API com paginação
+ /*    const getRegs = async (newPage = 1, newLimit = limit.value) => {
+        try {
+            const res = await axios.get(`/registros2`)
+            let items = admin.value ? res.data : res.data.filter(
+                (registro) => registro.demandante === email.value
+            )
+            regs.value = items
+            // regs.value = items.slice((newPage - 1) * newLimit, newPage * newLimit)
+            total.value = res.data.total
+            page.value = newPage
+            limit.value = newLimit
+
+            regs.value.forEach((registro) => {
+                let a = registro.created_at.split("T")[0];
+                let d = a.split("-");
+                let dat = d[2] + "/" + d[1] + "/" + d[0];
+                registro.created_at = dat;
+            })
+        } catch (e) {
+            console.error("Erro ao carregar os registros", e)
+        }
+    } */
     const getRegs = async () => {
         try {
-            const res = await axios.get("/registros")
-            regs.value = res.data
+            const res = await axios.get(`/registros`)
+            let items = admin.value ? res.data : res.data.filter(
+                (registro) => registro.demandante === email.value
+            )
+            regs.value = items
+            // regs.value = items.slice((newPage - 1) * newLimit, newPage * newLimit)
+            // total.value = res.data.total
+            // page.value = newPage
+            // limit.value = newLimit
+
+            regs.value.forEach((registro) => {
+                let a = registro.created_at.split("T")[0];
+                let d = a.split("-");
+                let dat = d[2] + "/" + d[1] + "/" + d[0];
+                registro.created_at = dat;
+            })
         } catch (e) {
             console.error("Erro ao carregar os registros", e)
         }
     }
 
-    // Computed para os registros da página atual
-    const pagedRegs = computed(() => {
-        const start = (page.value - 1) * limit.value
-        const end = start + limit.value
-        return regs.value.slice(start, end)
-    })
-
-    // Troca de página
+    // Troca de página: chama getRegs com a nova página.
     function setPage(newPage) {
-        page.value = newPage
+        getRegs(Number(newPage), limit.value)
     }
 
     return {
         getRegs,
+        setPage,
         regs,
-        pagedRegs,
         limit,
         page,
-        setPage,
-        totalRegs,
+        total,
     }
 })

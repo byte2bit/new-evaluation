@@ -1,4 +1,6 @@
 <script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
+
 import ListCheckboxes from '../ListCheckboxes.vue'
 import Respon from './form/Respon.vue'
 import Dispon from './form/Dispon.vue'
@@ -19,12 +21,12 @@ import 'vue3-toastify/dist/index.css'
 import "vue3-select-component/dist/style.css"
 
 
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/css/index.css';
+import Loading from 'vue-loading-overlay'
+import 'vue-loading-overlay/dist/css/index.css'
 
 // Stores
-import { useGetColabStore } from '@/stores/getColabStore'
-import { usePostColabStore } from '@/stores/postColabStore'
+import { useGetCheckStore } from '@/stores/getCheckboxesStore'
+import { usePostRegStore } from '@/stores/postRegStore'
 import { storeToRefs } from 'pinia'
 
 const colabStore = useGetColabStore()

@@ -16,7 +16,7 @@
                     @change="toggleColabSelection(colab.colab)">
 
                 <label v-memo="colab.colab" :for="`checkbox-${colab.colab}`" class="ms-2">
-                    {{ colab.colab }}
+                    {{ ++index+' - '+colab.colab }}
                 </label>
             </div>  
         </template>
@@ -25,13 +25,8 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
-import { useGetColabStore } from '@/stores/getColabStore'
-const colabStore = useGetColabStore()
-
-//dados do demandante
-import { demandantes } from '@/stores/demandantes.js'
-const admin = ref(demandantes.admin)
-const email = ref(demandantes.email)
+import { useGetCheckStore } from '@/stores/getCheckboxesStore'
+const colabStore = useGetCheckStore()
 
 const colabs = ref([])
 
@@ -40,23 +35,6 @@ onMounted(async () => {
     colabs.value = colabStore.colabs
 })
 
-/* function loadColabs() {
-    try {
-        if (admin.value) {
-            colabs.value = colabStore.colabs
-        } else {
-            colabs.value = colabStore.colabs.filter(
-                (registro) => registro.demandante === email.value
-            )
-        }
-    } catch { (() => toast.error("Erro ao carregar registros")) }
-} */
-
-/* onMounted(() => {
-    // loadColabs()
-    colabs.value = colabStore.colabs
-})
- */
 const selectedColabs = ref([])
 
 const allCheckBoxesSelected = computed(() =>

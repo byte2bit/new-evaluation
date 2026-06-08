@@ -21,7 +21,7 @@
             </div>
         </div>
         <nav class="bg-gray-600 text-white">
-            <div class="flex flex-wrap items-center justify-between 2xl:mx-auto px-4 py-2">
+            <div class="flex flex-wrap items-center justify-between 2xl:mx-auto px-4">
 
                 <button data-collapse-toggle="navbar-default" type="button"
                     class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
@@ -35,10 +35,9 @@
 
                 <div class="hidden w-full md:block md:w-auto" id="navbar-default">
                     <ul
-                        class="text-sm flex flex-col p-4 md:p-0 mt-4 border  text-white border-gray-100 rounded-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
+                        class="text-sm flex flex-col p-4 md:px-0 md:py-2 mt-4 border  text-white rounded-lg md:items-center md:justify-center md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0">
                         <li>
-                            <a href="#"
-                                class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
+                            <a href="#" class="block px-3 rounded-sm md:bg-transparent hover:text-yellow-200"
                                 aria-current="page">
                                 <router-link to="/">
                                     <svg class="ms-1 h-5 w-5 fill-white hover:fill-yellow-200" viewBox="0 0 576 512"
@@ -50,24 +49,22 @@
                             </a>
                         </li>
                         <li>
-                            <a class="block py-2 px-3 rounded-sm md:bg-transparent md:p-0 hover:text-yellow-200"
+                            <a class="block px-3 rounded-sm md:bg-transparent hover:text-yellow-200"
                                 aria-current="page">
-                                <router-link to="/registros">Registros</router-link>
+                                <router-link to="/registros" active-class="active">Registros</router-link>
                             </a>
                         </li>
                         <li>
-                            <a href="#"
-                                class="block py-2 px-3 text-white rounded-sm md:border-0 hover:text-yellow-200 md:p-0  ">
-                                <!-- class="block py-2 px-3 text-white rounded-sm hover:bg-blue-900  md:border-0 md:hover:text-yellow-200 md:p-0  "> -->
+                            <a href="#" class="block px-3 text-white rounded-sm md:border-0 hover:text-yellow-200  ">
+                                <!-- class="block px-3 text-white rounded-sm hover:bg-blue-900  md:border-0 md:hover:text-yellow-200  "> -->
                                 <!-- <router-link v-if="admin" to="/colabs">Lista de profissionais</router-link> -->
-                                <router-link to="/colabs">Lista de profissionais</router-link>
+                                <router-link to="/colabs" active-class="active">Lista de profissionais</router-link>
                             </a>
                         </li>
-                        <li>
-                            <a href="#"
-                                class="block py-2 px-3 text-white rounded-sm  md:border-0 hover:text-yellow-200 md:p-0  ">
+                        <li v-if="admin">
+                            <a href="#" class="block px-3 text-white rounded-sm  md:border-0 hover:text-yellow-200  ">
                                 <!-- <router-link v-if="admin" to="/inserir">Inserir profissional</router-link> -->
-                                <router-link to="/inserir">Inserir profissional</router-link>
+                                <router-link to="/inserir" active-class="active">Inserir profissional</router-link>
                             </a>
                         </li>
 
@@ -80,10 +77,23 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { demandantes } from '@/stores/demandantes.js'
+const admin = ref(demandantes.admin)
 </script>
 
 <style lang="scss" scoped>
+/* .router-link-active{
+    @apply bg-blue-900;
+} */
+
+.active {
+    font-weight: bold;
+    color: black;
+    background-color: rgba(255, 255, 255, 0.8);
+    // border-bottom: 2px solid #007bff;
+    padding: 7.8px 18px;
+}
 
 header {
     p {
@@ -106,6 +116,7 @@ header {
         margin-bottom: 15px;
     }
 }
+
 .demandante {
     font-size: 0.6rem;
 }

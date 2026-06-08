@@ -1,8 +1,10 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import axios from 'axios'
-import { toast } from 'vue3-toastify'
+import { ref } from 'vue'
 import 'vue3-toastify/dist/index.css'
+import { usePostColabStore } from '@/stores/postColabStore'
+
+const postStore = usePostColabStore()
+
 /* 
 import { useGetColabStore } from '@/stores/getColabStore'
 const colabStore = useGetColabStore()
@@ -41,20 +43,24 @@ const postData = ref({
     demandante: "",
 })
 
-function notify() {
-    toast.success("Dados registrados!", {
-        autoClose: 1000,
-        theme: 'colored',
+const save = () => {
+    postStore.saveColabs({
+        matricula: postData.value.matricula,
+        colab: postData.value.colab,
+        ppu: postData.value.ppu,
+        servico: postData.value.servico,
+        funcao: postData.value.funcao,
+        liderancas: postData.value.liderancas,
+        gerencia: postData.value.gerencia,
+        demandante: postData.value.demandante,
     })
-}
-
-function save() {
-    axios.post("newcolab", postData.value)
+    reset()
+/*     axios.post("newcolab", postData.value)
         .then(() => {
             reset()
             notify()
         })
-        .catch(() => toast.error("Erro ao registrar!"))
+        .catch(() => toast.error("Erro ao registrar!")) */
 }
 
 function reset() {
@@ -154,7 +160,7 @@ function reset() {
             </div>
 
             <div class="rounded-md bg-zinc-200 mt-10 p-3 pt-0 flex justify-end items-center">
-                <button
+                <button @click="save"
                     class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg px-5 py-2.5 text-center mt-4"
                     type="button">
                     Inserir
