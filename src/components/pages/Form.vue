@@ -23,13 +23,16 @@ import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/css/index.css'
 
 // Stores
+import { useGetColabStore } from '@/stores/getColabStore'
 import { useGetCheckStore } from '@/stores/getCheckboxesStore'
-import { usePostRegStore } from '@/stores/postRegStore'
+import { usePostColabStore } from '@/stores/postColabStore'
 import { storeToRefs } from 'pinia'
 
 const colabStore = useGetColabStore()
 const postStore = usePostColabStore()
-const { chkColabs } = storeToRefs(colabStore)
+const chkStore = useGetCheckStore()
+const { chkColabs } = storeToRefs(chkStore)
+const { colabs } = storeToRefs(colabStore)
 
 const isLoading = ref(false)
 const fullPage = ref(true)
