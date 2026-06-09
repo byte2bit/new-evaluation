@@ -25,3 +25,4 @@ trash
 *.njsproj
 *.sln
 *.sw?
+*.sql
